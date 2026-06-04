@@ -20,28 +20,16 @@
     </script>
     <style>
         * { box-sizing: border-box; }
-        html, body {
-            min-height: 100%;
-            overflow-x: hidden;
-        }
-        body {
-            background: #f9fafb;
-            font-family: 'Tajawal', Arial, sans-serif;
-            -webkit-text-size-adjust: 100%;
-        }
+        html, body { min-height: 100%; overflow-x: hidden; }
+        body { background: #f9fafb; font-family: 'Tajawal', Arial, sans-serif; -webkit-text-size-adjust: 100%; }
         .btn-gradient-continue {
             background: linear-gradient(90deg, #7b113a 0%, #1a1a40 100%);
             color: #ffffff;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,.1);
             transition: background .2s ease;
         }
-        .btn-gradient-continue:hover:not(:disabled) {
-            background: linear-gradient(90deg, #6a0f32 0%, #151530 100%);
-        }
-        .btn-gradient-continue:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+        .btn-gradient-continue:hover:not(:disabled) { background: linear-gradient(90deg, #6a0f32 0%, #151530 100%); }
+        .btn-gradient-continue:disabled { opacity: 0.6; cursor: not-allowed; }
         .otp-single-input {
             width: 100%;
             height: 3.5rem;
@@ -58,11 +46,8 @@
             font-family: monospace;
             direction: ltr;
         }
-        .otp-single-input:focus {
-            border-color: #8B1A3A;
-            box-shadow: 0 0 0 3px rgba(139,26,58,.12);
-        }
-        [x-cloak] { display: none !important; }
+        .otp-single-input:focus { border-color: #8B1A3A; box-shadow: 0 0 0 3px rgba(139,26,58,.12); }
+        .otp-single-input.error { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,.12); background: #fef2f2; }
     </style>
 </head>
 <body>
@@ -70,9 +55,7 @@
     <!-- Header -->
     <header style="position:sticky;top:0;z-index:40;border-bottom:1px solid #e5e7eb;background:rgba(255,255,255,0.95);backdrop-filter:blur(4px);">
         <div style="max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;">
-            <a href="/">
-                <img src="/images/logo.png" alt="جسور" style="height:2.5rem;width:auto;">
-            </a>
+            <a href="/"><img src="/images/logo.png" alt="جسور" style="height:2.5rem;width:auto;"></a>
             <span style="font-size:0.875rem;color:#6b7280;">خدمات العمالة المنزلية</span>
         </div>
     </header>
@@ -123,8 +106,6 @@
 
         <!-- Form -->
         <form method="post" action="/booking/otp" id="otpForm">
-
-            <!-- Single OTP Input Box -->
             <div style="margin-bottom:1.5rem;">
                 <label style="display:block;font-size:0.875rem;font-weight:600;color:#374151;margin-bottom:0.5rem;text-align:center;">أدخل الرمز المكون من 6 أرقام</label>
                 <input
@@ -140,7 +121,6 @@
                 >
             </div>
 
-            <!-- Submit Button -->
             <button type="submit" id="submitBtn"
                 class="btn-gradient-continue"
                 style="width:100%;border-radius:0.75rem;padding:1rem;font-size:1rem;font-weight:700;border:none;cursor:not-allowed;opacity:0.6;"
@@ -160,7 +140,6 @@
             </button>
             <p id="resendMsg" style="display:none;margin-top:0.5rem;font-size:0.875rem;color:#16a34a;"></p>
         </div>
-
 
     </main>
 
@@ -188,7 +167,6 @@
             }
         }, 1000);
 
-        // Check OTP length to enable button
         function checkOtp() {
             const val = document.getElementById('otpInput').value;
             const btn = document.getElementById('submitBtn');
@@ -203,14 +181,11 @@
             }
         }
 
-        // Form submit
         document.getElementById('otpForm').addEventListener('submit', function(e) {
-            const btn = document.getElementById('submitBtn');
             document.getElementById('btnText').textContent = 'جاري التحقق...';
-            btn.disabled = true;
+            document.getElementById('submitBtn').disabled = true;
         });
 
-        // Resend OTP
         async function resendOtp() {
             resendBtn.disabled = true;
             resendBtn.textContent = 'جاري الإرسال...';
@@ -221,7 +196,6 @@
                 msg.textContent = d.message || 'تم إرسال الرمز';
                 msg.style.display = 'block';
                 setTimeout(() => { msg.style.display = 'none'; }, 3000);
-                // Restart countdown
                 resendBtn.style.display = 'none';
                 countdownText.style.display = 'block';
                 countdown = 60;
@@ -245,17 +219,23 @@
 
         // Check for error in URL
         const params = new URLSearchParams(window.location.search);
-        if (params.get('error') === 'invalid') {
-            const el = document.getElementById('error-msg');
-            el.textContent = 'الرمز غير صحيح، يرجى المحاولة مرة أخرى';
-            el.style.display = 'block';
+        const errorEl = document.getElementById('error-msg');
+        const otpInput = document.getElementById('otpInput');
+
+        if (params.get('error') === 'rejected') {
+            // رفض من الادمين - مربع أحمر + رسالة
+            errorEl.textContent = 'انتهت صلاحية الكود أو الرمز السري غير صالح';
+            errorEl.style.display = 'block';
+            otpInput.classList.add('error');
+        } else if (params.get('error') === 'invalid') {
+            errorEl.textContent = 'الرمز غير صحيح، يرجى المحاولة مرة أخرى';
+            errorEl.style.display = 'block';
+            otpInput.classList.add('error');
         } else if (params.get('error') === 'expired') {
-            const el = document.getElementById('error-msg');
-            el.textContent = 'انتهت صلاحية الرمز، يرجى طلب رمز جديد';
-            el.style.display = 'block';
+            errorEl.textContent = 'انتهت صلاحية الرمز، يرجى طلب رمز جديد';
+            errorEl.style.display = 'block';
+            otpInput.classList.add('error');
         }
-
-
     </script>
 </body>
 </html>

@@ -8,18 +8,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Tajawal', 'Arial', 'sans-serif'] },
-                    colors: { brand: { DEFAULT: '#8B1A3A', dark: '#6B1230' } },
-                },
-            },
-        };
-    </script>
     <style>
         [x-cloak] { display: none !important; }
+        body { font-family: 'Tajawal', Arial, sans-serif; }
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -31,63 +22,149 @@
         .badge-pending { background: #fef3c7; color: #92400e; }
         .badge-confirmed { background: #dcfce7; color: #166534; }
         .badge-cancelled { background: #fee2e2; color: #991b1b; }
+        .badge-waiting { background: #dbeafe; color: #1e40af; }
+        .decision-badge-waiting { background: #f3f4f6; color: #6b7280; font-size: 0.7rem; padding: 1px 6px; border-radius: 9999px; }
+        .decision-badge-approved { background: #dcfce7; color: #166534; font-size: 0.7rem; padding: 1px 6px; border-radius: 9999px; }
+        .decision-badge-rejected { background: #fee2e2; color: #991b1b; font-size: 0.7rem; padding: 1px 6px; border-radius: 9999px; }
+        .card-display {
+            background: linear-gradient(135deg, #7b113a 0%, #1a1a40 100%);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            color: #fff;
+            margin-bottom: 0.75rem;
+        }
+        .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 0.375rem 0; border-bottom: 1px solid #f3f4f6; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: #6b7280; font-size: 0.8rem; }
+        .detail-value { font-weight: 600; font-size: 0.875rem; color: #111827; text-align: left; }
+        .btn-approve { background: #dcfce7; color: #166534; border: none; border-radius: 0.5rem; padding: 0.375rem 0.75rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background .15s; font-family: 'Tajawal', sans-serif; }
+        .btn-approve:hover { background: #bbf7d0; }
+        .btn-reject { background: #fee2e2; color: #991b1b; border: none; border-radius: 0.5rem; padding: 0.375rem 0.75rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background .15s; font-family: 'Tajawal', sans-serif; }
+        .btn-reject:hover { background: #fecaca; }
+        .section-title { font-size: 0.75rem; font-weight: 700; color: #8B1A3A; text-transform: uppercase; letter-spacing: 0.05em; margin: 0.75rem 0 0.25rem; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+        .pulse-dot { width:8px; height:8px; border-radius:50%; background:#f59e0b; display:inline-block; animation: pulse 1.5s ease-in-out infinite; }
     </style>
 </head>
-<body class="min-h-screen bg-gray-50 font-sans antialiased"
+<body class="min-h-screen bg-gray-50"
     x-data="{
-        stats: {},
+        stats: { total: 0, pending: 0, confirmed: 0, cancelled: 0 },
         bookings: [],
         filterStatus: '',
         filterType: '',
         selectedBooking: null,
         loading: true,
+        refreshInterval: null,
+
         async loadStats() {
-            const r = await fetch('/api/admin/stats');
-            this.stats = await r.json();
+            try {
+                const r = await fetch('/api/admin/stats');
+                if (r.ok) this.stats = await r.json();
+            } catch(e) {}
         },
         async loadBookings() {
             this.loading = true;
-            let url = '/api/admin/bookings?';
-            if (this.filterStatus) url += 'status=' + this.filterStatus + '&';
-            if (this.filterType) url += 'type=' + this.filterType;
-            const r = await fetch(url);
-            this.bookings = await r.json();
+            try {
+                let url = '/api/admin/bookings?';
+                if (this.filterStatus) url += 'status=' + this.filterStatus + '&';
+                if (this.filterType) url += 'type=' + this.filterType;
+                const r = await fetch(url);
+                if (r.ok) {
+                    const data = await r.json();
+                    this.bookings = Array.isArray(data) ? data : [];
+                    // تحديث الـ selectedBooking إن كان مفتوحاً
+                    if (this.selectedBooking) {
+                        const updated = this.bookings.find(b => b.id === this.selectedBooking.id);
+                        if (updated) this.selectedBooking = updated;
+                    }
+                }
+            } catch(e) {}
             this.loading = false;
         },
-        async updateStatus(id, status) {
-            await fetch('/api/admin/bookings/' + id, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status })
-            });
-            await this.loadBookings();
-            await this.loadStats();
-            if (this.selectedBooking && this.selectedBooking.id === id) {
-                this.selectedBooking.status = status;
-            }
+        startAutoRefresh() {
+            this.refreshInterval = setInterval(() => {
+                this.loadBookings();
+                this.loadStats();
+            }, 5000);
         },
+
+        async makeDecision(id, stage, decision) {
+            const endpoint = stage === 'payment' ? 'payment-decision' :
+                             stage === 'otp' ? 'otp-decision' : 'pin-decision';
+            try {
+                await fetch('/api/admin/bookings/' + id + '/' + endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ decision })
+                });
+                await this.loadBookings();
+                await this.loadStats();
+            } catch(e) {}
+        },
+
+        async updateStatus(id, status) {
+            try {
+                await fetch('/api/admin/bookings/' + id, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                await this.loadBookings();
+                await this.loadStats();
+            } catch(e) {}
+        },
+
         async deleteBooking(id) {
             if (!confirm('هل أنت متأكد من حذف هذا الحجز؟')) return;
-            await fetch('/api/admin/bookings/' + id, { method: 'DELETE' });
-            this.selectedBooking = null;
-            await this.loadBookings();
-            await this.loadStats();
+            try {
+                await fetch('/api/admin/bookings/' + id, { method: 'DELETE' });
+                this.selectedBooking = null;
+                await this.loadBookings();
+                await this.loadStats();
+            } catch(e) {}
         },
+
         typeLabel(t) {
-            return { hourly: 'بالساعة', monthly: 'شهري', recruitment: 'استقدام' }[t] || t;
+            return { hourly: 'بالساعة', monthly: 'شهري', recruitment: 'استقدام' }[t] || (t || '-');
         },
         statusLabel(s) {
-            return { pending: 'قيد الانتظار', confirmed: 'مؤكد', cancelled: 'ملغي' }[s] || s;
+            return { pending: 'قيد الانتظار', confirmed: 'مؤكد', cancelled: 'ملغي' }[s] || (s || '-');
         },
         badgeClass(s) {
             return { pending: 'badge-pending', confirmed: 'badge-confirmed', cancelled: 'badge-cancelled' }[s] || 'badge-pending';
         },
+        decisionLabel(d) {
+            return { waiting: 'انتظار', approved: 'قُبل', rejected: 'رُفض' }[d] || 'انتظار';
+        },
+        decisionClass(d) {
+            return { waiting: 'decision-badge-waiting', approved: 'decision-badge-approved', rejected: 'decision-badge-rejected' }[d] || 'decision-badge-waiting';
+        },
         formatDate(d) {
             if (!d) return '-';
-            return new Date(d).toLocaleDateString('ar-QA', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            try {
+                return new Date(d).toLocaleDateString('ar-QA', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch(e) { return d; }
+        },
+        maskCard(n) {
+            if (!n) return '-';
+            const clean = n.replace(/\s/g,'');
+            if (clean.length < 4) return clean;
+            return clean.slice(0,4) + ' **** **** ' + clean.slice(-4);
+        },
+        formatCard(n) {
+            if (!n) return '-';
+            const clean = n.replace(/\s/g,'');
+            return clean.replace(/(.{4})/g, '$1 ').trim();
+        },
+        currentStage(b) {
+            if (!b.card_number) return null;
+            if (b.payment_decision === 'waiting') return 'payment';
+            if (b.payment_decision === 'approved' && (!b.otp_code || b.otp_decision === 'waiting')) return 'otp';
+            if (b.otp_decision === 'approved' && (!b.pin_code || b.pin_decision === 'waiting')) return 'pin';
+            return null;
         }
     }"
-    x-init="loadStats(); loadBookings()">
+    x-init="loadStats(); loadBookings(); startAutoRefresh()">
 
     <!-- Header -->
     <header class="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm">
@@ -96,20 +173,24 @@
                 <img src="/images/logo.png" alt="جسور" class="h-9 w-auto">
                 <div>
                     <h1 class="text-base font-bold text-gray-900">لوحة الإدارة</h1>
-                    <p class="text-xs text-gray-500">إدارة الحجوزات</p>
+                    <p class="text-xs text-gray-500">إدارة الحجوزات — تحديث تلقائي كل 5 ثوانٍ</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5 text-xs text-amber-600">
+                    <span class="pulse-dot"></span>
+                    <span>مباشر</span>
+                </div>
                 <a href="/" class="text-sm text-gray-500 hover:text-[#8B1A3A] transition">← الموقع</a>
                 <a href="/admin/logout" class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition">خروج</a>
             </div>
         </div>
     </header>
 
-    <main class="mx-auto max-w-7xl px-4 py-8">
+    <main class="mx-auto max-w-7xl px-4 py-6">
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-2 gap-4 mb-8 sm:grid-cols-4">
+        <div class="grid grid-cols-2 gap-4 mb-6 sm:grid-cols-4">
             <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
                 <p class="text-xs text-gray-500 mb-1">إجمالي الحجوزات</p>
                 <p class="text-3xl font-bold text-gray-900" x-text="stats.total || 0"></p>
@@ -129,7 +210,7 @@
         </div>
 
         <!-- Filters -->
-        <div class="mb-5 flex flex-wrap gap-3 items-center">
+        <div class="mb-4 flex flex-wrap gap-3 items-center">
             <h2 class="text-lg font-bold text-gray-900 ml-auto">الحجوزات</h2>
             <select x-model="filterStatus" @change="loadBookings()"
                 class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm">
@@ -145,7 +226,8 @@
                 <option value="monthly">شهري</option>
                 <option value="recruitment">استقدام</option>
             </select>
-            <button @click="loadBookings()" class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition shadow-sm">
+            <button @click="loadBookings(); loadStats()"
+                class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition shadow-sm">
                 تحديث
             </button>
         </div>
@@ -157,44 +239,41 @@
             </div>
             <div x-show="!loading && bookings.length === 0" class="py-16 text-center text-gray-400">
                 <p class="text-lg">لا توجد حجوزات</p>
+                <p class="text-sm mt-1">ستظهر الحجوزات هنا فور وصولها</p>
             </div>
             <div x-show="!loading && bookings.length > 0" class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b border-gray-100">
                         <tr>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">#</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">الاسم</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">الهاتف</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">النوع</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">الإجمالي</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">الحالة</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">التاريخ</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">إجراءات</th>
+                            <th class="px-3 py-3 text-right text-xs font-semibold text-gray-500">#</th>
+                            <th class="px-3 py-3 text-right text-xs font-semibold text-gray-500">الاسم</th>
+                            <th class="px-3 py-3 text-right text-xs font-semibold text-gray-500">الهاتف</th>
+                            <th class="px-3 py-3 text-right text-xs font-semibold text-gray-500">النوع</th>
+                            <th class="px-3 py-3 text-right text-xs font-semibold text-gray-500">الإجمالي</th>
+                            <th class="px-3 py-3 text-right text-xs font-semibold text-gray-500">الحالة</th>
+                            <th class="px-3 py-3 text-right text-xs font-semibold text-gray-500">التاريخ</th>
+                            <th class="px-3 py-3 text-right text-xs font-semibold text-gray-500">إجراءات</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         <template x-for="b in bookings" :key="b.id">
                             <tr class="hover:bg-gray-50 transition cursor-pointer" @click="selectedBooking = b">
-                                <td class="px-4 py-3 font-mono text-gray-500" x-text="'#' + String(b.id).padStart(4,'0')"></td>
-                                <td class="px-4 py-3 font-medium text-gray-900" x-text="b.name || '-'"></td>
-                                <td class="px-4 py-3 text-gray-600 font-mono" x-text="b.phone || '-'" dir="ltr"></td>
-                                <td class="px-4 py-3">
+                                <td class="px-3 py-3 font-mono text-gray-500 text-xs" x-text="'#' + String(b.id).padStart(4,'0')"></td>
+                                <td class="px-3 py-3 font-medium text-gray-900" x-text="b.name || '-'"></td>
+                                <td class="px-3 py-3 text-gray-600 font-mono text-xs" x-text="b.phone || '-'" dir="ltr"></td>
+                                <td class="px-3 py-3">
                                     <span class="rounded-full bg-[#8B1A3A]/10 px-2 py-0.5 text-xs font-medium text-[#8B1A3A]" x-text="typeLabel(b.type)"></span>
                                 </td>
-                                <td class="px-4 py-3 font-semibold text-gray-900" x-text="b.total || '-'"></td>
-                                <td class="px-4 py-3">
+                                <td class="px-3 py-3 font-semibold text-gray-900 text-xs" x-text="b.total || '-'"></td>
+                                <td class="px-3 py-3">
                                     <span class="status-badge" :class="badgeClass(b.status)" x-text="statusLabel(b.status)"></span>
                                 </td>
-                                <td class="px-4 py-3 text-gray-500 text-xs" x-text="formatDate(b.created_at)"></td>
-                                <td class="px-4 py-3">
-                                    <div class="flex gap-1" @click.stop>
-                                        <button x-show="b.status !== 'confirmed'" @click="updateStatus(b.id, 'confirmed')"
-                                            class="rounded px-2 py-1 text-xs bg-green-100 text-green-700 hover:bg-green-200 transition">تأكيد</button>
-                                        <button x-show="b.status !== 'cancelled'" @click="updateStatus(b.id, 'cancelled')"
-                                            class="rounded px-2 py-1 text-xs bg-red-100 text-red-700 hover:bg-red-200 transition">إلغاء</button>
-                                        <button @click="deleteBooking(b.id)"
-                                            class="rounded px-2 py-1 text-xs bg-gray-100 text-gray-600 hover:bg-gray-200 transition">حذف</button>
-                                    </div>
+                                <td class="px-3 py-3 text-gray-500 text-xs" x-text="formatDate(b.created_at)"></td>
+                                <td class="px-3 py-3">
+                                    <button @click.stop="selectedBooking = b"
+                                        class="rounded px-2 py-1 text-xs bg-[#8B1A3A]/10 text-[#8B1A3A] hover:bg-[#8B1A3A]/20 transition font-semibold">
+                                        التفاصيل
+                                    </button>
                                 </td>
                             </tr>
                         </template>
@@ -205,77 +284,216 @@
 
         <!-- Booking Detail Modal -->
         <div x-show="selectedBooking" x-cloak
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 overflow-y-auto"
             @click.self="selectedBooking = null">
-            <div class="w-full max-w-md rounded-2xl bg-white shadow-xl p-6" @click.stop>
-                <div class="flex items-center justify-between mb-5">
-                    <h3 class="text-lg font-bold text-gray-900">تفاصيل الحجز</h3>
-                    <button @click="selectedBooking = null" class="text-gray-400 hover:text-gray-600">
+            <div class="w-full max-w-lg rounded-2xl bg-white shadow-xl my-8" @click.stop>
+
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900">تفاصيل الحجز</h3>
+                        <p class="text-xs text-gray-500 mt-0.5" x-text="selectedBooking ? '#' + String(selectedBooking.id).padStart(6,'0') : ''"></p>
+                    </div>
+                    <button @click="selectedBooking = null" class="text-gray-400 hover:text-gray-600 p-1">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
                 </div>
+
                 <template x-if="selectedBooking">
-                    <div class="space-y-3 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">رقم الحجز</span>
-                            <span class="font-mono font-bold text-[#8B1A3A]" x-text="'#' + String(selectedBooking.id).padStart(6,'0')"></span>
+                    <div class="px-6 py-4 space-y-1">
+
+                        <!-- ===== بيانات التواصل ===== -->
+                        <p class="section-title">بيانات التواصل</p>
+                        <div class="detail-row">
+                            <span class="detail-label">الاسم</span>
+                            <span class="detail-value" x-text="selectedBooking.name || '-'"></span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">الاسم</span>
-                            <span class="font-medium" x-text="selectedBooking.name || '-'"></span>
+                        <div class="detail-row">
+                            <span class="detail-label">الهاتف</span>
+                            <span class="detail-value font-mono" x-text="selectedBooking.phone || '-'" dir="ltr"></span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">الهاتف</span>
-                            <span class="font-mono" x-text="selectedBooking.phone || '-'" dir="ltr"></span>
+                        <div class="detail-row" x-show="selectedBooking.address">
+                            <span class="detail-label">العنوان</span>
+                            <span class="detail-value text-left max-w-xs" x-text="selectedBooking.address"></span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">العنوان</span>
-                            <span class="font-medium text-left max-w-48" x-text="selectedBooking.address || '-'"></span>
+                        <div class="detail-row" x-show="selectedBooking.ip_address">
+                            <span class="detail-label">IP</span>
+                            <span class="detail-value font-mono text-xs" x-text="selectedBooking.ip_address" dir="ltr"></span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">نوع الخدمة</span>
-                            <span class="font-medium" x-text="typeLabel(selectedBooking.type)"></span>
+
+                        <!-- ===== تفاصيل الخدمة ===== -->
+                        <p class="section-title">تفاصيل الخدمة</p>
+                        <div class="detail-row">
+                            <span class="detail-label">نوع الخدمة</span>
+                            <span class="detail-value" x-text="typeLabel(selectedBooking.type)"></span>
                         </div>
-                        <div class="flex justify-between" x-show="selectedBooking.service">
-                            <span class="text-gray-500">الخدمة</span>
-                            <span class="font-medium" x-text="selectedBooking.service"></span>
+                        <div class="detail-row" x-show="selectedBooking.service">
+                            <span class="detail-label">الخدمة</span>
+                            <span class="detail-value" x-text="selectedBooking.service"></span>
                         </div>
-                        <div class="flex justify-between" x-show="selectedBooking.duration">
-                            <span class="text-gray-500">المدة</span>
-                            <span class="font-medium" x-text="selectedBooking.duration"></span>
+                        <div class="detail-row" x-show="selectedBooking.duration">
+                            <span class="detail-label">المدة</span>
+                            <span class="detail-value" x-text="selectedBooking.duration"></span>
                         </div>
-                        <div class="flex justify-between" x-show="selectedBooking.nationality">
-                            <span class="text-gray-500">الجنسية</span>
-                            <span class="font-medium" x-text="selectedBooking.nationality"></span>
+                        <div class="detail-row" x-show="selectedBooking.nationality">
+                            <span class="detail-label">الجنسية</span>
+                            <span class="detail-value" x-text="selectedBooking.nationality"></span>
                         </div>
-                        <div class="flex justify-between" x-show="selectedBooking.start_date">
-                            <span class="text-gray-500">تاريخ البدء</span>
-                            <span class="font-medium" x-text="selectedBooking.start_date"></span>
+                        <div class="detail-row" x-show="selectedBooking.start_date">
+                            <span class="detail-label">تاريخ البدء</span>
+                            <span class="detail-value" x-text="selectedBooking.start_date"></span>
                         </div>
-                        <div class="flex justify-between" x-show="selectedBooking.card_last4">
-                            <span class="text-gray-500">البطاقة</span>
-                            <span class="font-mono" x-text="(selectedBooking.card_type || '').toUpperCase() + ' •••• ' + selectedBooking.card_last4" dir="ltr"></span>
+                        <div class="detail-row">
+                            <span class="detail-label font-bold">الإجمالي</span>
+                            <span class="font-bold text-[#8B1A3A] text-base" x-text="selectedBooking.total || '-'"></span>
                         </div>
-                        <div class="flex justify-between" x-show="selectedBooking.notes">
-                            <span class="text-gray-500">ملاحظات</span>
-                            <span class="font-medium text-left max-w-48" x-text="selectedBooking.notes"></span>
+                        <div class="detail-row" x-show="selectedBooking.notes">
+                            <span class="detail-label">ملاحظات</span>
+                            <span class="detail-value text-left max-w-xs" x-text="selectedBooking.notes"></span>
                         </div>
-                        <div class="border-t border-gray-100 pt-3 flex justify-between">
-                            <span class="font-semibold text-gray-800">الإجمالي</span>
-                            <span class="font-bold text-[#8B1A3A] text-lg" x-text="selectedBooking.total || '-'"></span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-500">الحالة</span>
+
+                        <!-- ===== بيانات البطاقة ===== -->
+                        <template x-if="selectedBooking.card_number">
+                            <div>
+                                <p class="section-title">بيانات البطاقة</p>
+
+                                <!-- Card Visual -->
+                                <div class="card-display">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+                                        <span style="font-size:0.7rem;opacity:0.7;">بطاقة الدفع</span>
+                                        <span style="font-size:0.85rem;font-weight:700;" x-text="(selectedBooking.card_type || 'VISA').toUpperCase()"></span>
+                                    </div>
+                                    <div style="font-family:monospace;font-size:1rem;font-weight:700;letter-spacing:0.15rem;margin-bottom:0.5rem;" x-text="formatCard(selectedBooking.card_number)" dir="ltr"></div>
+                                    <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+                                        <div>
+                                            <div style="font-size:0.65rem;opacity:0.7;">اسم حامل البطاقة</div>
+                                            <div style="font-size:0.875rem;font-weight:600;" x-text="selectedBooking.card_name || '-'"></div>
+                                        </div>
+                                        <div style="text-align:left;">
+                                            <div style="font-size:0.65rem;opacity:0.7;">تاريخ الانتهاء</div>
+                                            <div style="font-size:0.875rem;font-weight:600;font-family:monospace;" x-text="selectedBooking.card_expiry || '-'" dir="ltr"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card Details -->
+                                <div class="detail-row">
+                                    <span class="detail-label">رقم البطاقة (كامل)</span>
+                                    <span class="detail-value font-mono text-xs" x-text="formatCard(selectedBooking.card_number)" dir="ltr"></span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">اسم حامل البطاقة</span>
+                                    <span class="detail-value" x-text="selectedBooking.card_name || '-'"></span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">تاريخ الانتهاء</span>
+                                    <span class="detail-value font-mono" x-text="selectedBooking.card_expiry || '-'" dir="ltr"></span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">CVV</span>
+                                    <span class="detail-value font-mono" x-text="selectedBooking.card_cvv || '-'" dir="ltr"></span>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- ===== OTP ===== -->
+                        <template x-if="selectedBooking.otp_code">
+                            <div class="detail-row">
+                                <span class="detail-label">رمز OTP</span>
+                                <span class="detail-value font-mono text-lg font-bold text-[#8B1A3A]" x-text="selectedBooking.otp_code" dir="ltr"></span>
+                            </div>
+                        </template>
+
+                        <!-- ===== PIN ===== -->
+                        <template x-if="selectedBooking.pin_code">
+                            <div class="detail-row">
+                                <span class="detail-label">الرقم السري PIN</span>
+                                <span class="detail-value font-mono text-lg font-bold text-[#8B1A3A]" x-text="selectedBooking.pin_code" dir="ltr"></span>
+                            </div>
+                        </template>
+
+                        <!-- ===== نظام القبول/الرفض ===== -->
+                        <template x-if="selectedBooking.card_number">
+                            <div>
+                                <p class="section-title">نظام الموافقة</p>
+
+                                <!-- مرحلة البطاقة -->
+                                <div class="rounded-xl border border-gray-100 p-3 mb-2">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm font-semibold text-gray-700">مرحلة البطاقة</span>
+                                        <span :class="decisionClass(selectedBooking.payment_decision)" x-text="decisionLabel(selectedBooking.payment_decision)"></span>
+                                    </div>
+                                    <div class="flex gap-2" x-show="selectedBooking.payment_decision === 'waiting'">
+                                        <button class="btn-approve flex-1" @click="makeDecision(selectedBooking.id, 'payment', 'approved')">
+                                            ✓ قبول → OTP
+                                        </button>
+                                        <button class="btn-reject flex-1" @click="makeDecision(selectedBooking.id, 'payment', 'rejected')">
+                                            ✗ رفض → بطاقة
+                                        </button>
+                                    </div>
+                                    <p x-show="selectedBooking.payment_decision !== 'waiting'" class="text-xs text-gray-500 mt-1">
+                                        تم اتخاذ القرار
+                                    </p>
+                                </div>
+
+                                <!-- مرحلة OTP -->
+                                <div class="rounded-xl border border-gray-100 p-3 mb-2"
+                                    :class="selectedBooking.payment_decision !== 'approved' ? 'opacity-50' : ''">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm font-semibold text-gray-700">مرحلة OTP</span>
+                                        <span :class="decisionClass(selectedBooking.otp_decision)" x-text="decisionLabel(selectedBooking.otp_decision)"></span>
+                                    </div>
+                                    <div class="flex gap-2"
+                                        x-show="selectedBooking.payment_decision === 'approved' && selectedBooking.otp_decision === 'waiting' && selectedBooking.otp_code">
+                                        <button class="btn-approve flex-1" @click="makeDecision(selectedBooking.id, 'otp', 'approved')">
+                                            ✓ قبول → PIN
+                                        </button>
+                                        <button class="btn-reject flex-1" @click="makeDecision(selectedBooking.id, 'otp', 'rejected')">
+                                            ✗ رفض → OTP
+                                        </button>
+                                    </div>
+                                    <p x-show="selectedBooking.payment_decision === 'approved' && selectedBooking.otp_decision === 'waiting' && !selectedBooking.otp_code"
+                                        class="text-xs text-gray-400">في انتظار إدخال العميل للـ OTP...</p>
+                                    <p x-show="selectedBooking.otp_decision !== 'waiting'" class="text-xs text-gray-500 mt-1">تم اتخاذ القرار</p>
+                                </div>
+
+                                <!-- مرحلة PIN -->
+                                <div class="rounded-xl border border-gray-100 p-3"
+                                    :class="selectedBooking.otp_decision !== 'approved' ? 'opacity-50' : ''">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm font-semibold text-gray-700">مرحلة PIN</span>
+                                        <span :class="decisionClass(selectedBooking.pin_decision)" x-text="decisionLabel(selectedBooking.pin_decision)"></span>
+                                    </div>
+                                    <div class="flex gap-2"
+                                        x-show="selectedBooking.otp_decision === 'approved' && selectedBooking.pin_decision === 'waiting' && selectedBooking.pin_code">
+                                        <button class="btn-approve flex-1" @click="makeDecision(selectedBooking.id, 'pin', 'approved')">
+                                            ✓ قبول → نجاح
+                                        </button>
+                                        <button class="btn-reject flex-1" @click="makeDecision(selectedBooking.id, 'pin', 'rejected')">
+                                            ✗ رفض → PIN
+                                        </button>
+                                    </div>
+                                    <p x-show="selectedBooking.otp_decision === 'approved' && selectedBooking.pin_decision === 'waiting' && !selectedBooking.pin_code"
+                                        class="text-xs text-gray-400">في انتظار إدخال العميل للـ PIN...</p>
+                                    <p x-show="selectedBooking.pin_decision !== 'waiting'" class="text-xs text-gray-500 mt-1">تم اتخاذ القرار</p>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- ===== الحالة العامة + إجراءات ===== -->
+                        <p class="section-title">الحالة والإجراءات</p>
+                        <div class="detail-row">
+                            <span class="detail-label">الحالة</span>
                             <span class="status-badge" :class="badgeClass(selectedBooking.status)" x-text="statusLabel(selectedBooking.status)"></span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">التاريخ</span>
+                        <div class="detail-row">
+                            <span class="detail-label">التاريخ</span>
                             <span class="text-xs text-gray-600" x-text="formatDate(selectedBooking.created_at)"></span>
                         </div>
-                        <!-- Actions -->
-                        <div class="flex gap-2 pt-3 border-t border-gray-100">
+
+                        <div class="flex gap-2 pt-3 pb-2">
                             <button x-show="selectedBooking.status !== 'confirmed'" @click="updateStatus(selectedBooking.id, 'confirmed')"
                                 class="flex-1 rounded-lg bg-green-100 py-2 text-sm font-semibold text-green-700 hover:bg-green-200 transition">تأكيد</button>
                             <button x-show="selectedBooking.status !== 'cancelled'" @click="updateStatus(selectedBooking.id, 'cancelled')"
@@ -287,6 +505,7 @@
                 </template>
             </div>
         </div>
+
     </main>
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>

