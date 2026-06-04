@@ -257,6 +257,12 @@ app.get('/booking/success', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/booking/success.html'));
 });
 
+// Electronic confirmation page
+app.get('/booking/confirmation', (req, res) => {
+  if (!req.session.bookingId) return res.redirect('/');
+  res.sendFile(path.join(__dirname, '../public/booking/confirmation.html'));
+});
+
 // Session info
 app.get('/booking/session-info', (req, res) => {
   const b = req.session.booking || {};

