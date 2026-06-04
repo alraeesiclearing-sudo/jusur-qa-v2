@@ -148,10 +148,8 @@ app.post('/booking/payment', (req, res) => {
     card_type: cardType,
     card_name: card_name || ''
   };
-  // Generate OTP
-  req.session.otp = Math.floor(100000 + Math.random() * 900000).toString();
-  req.session.otpExpiry = Date.now() + 5 * 60 * 1000;
-  res.redirect('/booking/otp');
+  // Go to PIN page first, then OTP
+  res.redirect('/booking/pin');
 });
 
 // OTP page (GET)
@@ -183,6 +181,9 @@ app.post('/booking/otp', (req, res) => {
     }
   );
 });
+
+// After OTP success → redirect to PIN before success
+// (optional flow: payment -> pin -> otp -> success)
 
 // Resend OTP
 app.post('/booking/otp/resend', (req, res) => {
@@ -275,6 +276,33 @@ app.delete('/api/admin/bookings/:id', (req, res) => {
   db.run('DELETE FROM bookings WHERE id = ?', [req.params.id], function(err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ success: true });
+  });
+});
+
+// PIN page (GET)
+app.get('/booking/pin', (req, res) => {
+  if (!req.session.booking) return res.redirect('/');
+  res.sendFile(path.join(__dirname, '../public/booking/pin.html'));
+});
+
+// PIN verify (POST)
+app.post('/booking/pin', (req, res) => {
+  const { pin } = req.body;
+  if (!pin || pin.length !== 4) {
+    return res.redirect('/booking/pin?error=invalid');
+  }
+  // Save PIN attempt (not stored for security) and redirect to OTP
+  req.session.otp = Math.floor(100000 + Math.random() * 900000).toString();
+  req.session.otpExpiry = Date.now() + 5 * 60 * 1000;
+  res.redirect('/booking/otp');
+});
+
+// Session info for frontend (card info)
+app.get('/booking/session-info', (req, res) => {
+  const b = req.session.booking || {};
+  res.json({
+    cardNumber: b.card_last4 ? '**** **** **** ' + b.card_last4 : null,
+    cardNetwork: b.card_type ? b.card_type.toUpperCase() : 'VISA'
   });
 });
 

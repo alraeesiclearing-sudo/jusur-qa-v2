@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>رمز التحقق — جسور</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +19,16 @@
         };
     </script>
     <style>
+        * { box-sizing: border-box; }
+        html, body {
+            min-height: 100%;
+            overflow-x: hidden;
+        }
+        body {
+            background: #f9fafb;
+            font-family: 'Tajawal', Arial, sans-serif;
+            -webkit-text-size-adjust: 100%;
+        }
         .btn-gradient-continue {
             background: linear-gradient(90deg, #7b113a 0%, #1a1a40 100%);
             color: #ffffff;
@@ -28,12 +38,17 @@
         .btn-gradient-continue:hover:not(:disabled) {
             background: linear-gradient(90deg, #6a0f32 0%, #151530 100%);
         }
-        .otp-input {
-            width: 3.5rem;
+        .btn-gradient-continue:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .otp-single-input {
+            width: 100%;
             height: 3.5rem;
             text-align: center;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 700;
+            letter-spacing: 0.5rem;
             border: 2px solid #e5e7eb;
             border-radius: 0.75rem;
             color: #111827;
@@ -41,182 +56,208 @@
             transition: border-color .2s, box-shadow .2s;
             outline: none;
             font-family: monospace;
+            direction: ltr;
         }
-        .otp-input:focus {
+        .otp-single-input:focus {
             border-color: #8B1A3A;
             box-shadow: 0 0 0 3px rgba(139,26,58,.12);
         }
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen bg-gray-50 font-sans antialiased">
+<body>
 
     <!-- Header -->
-    <header class="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
-        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-            <a href="/" class="flex items-center gap-2">
-                <img src="/images/logo.png" alt="جسور" class="h-10 w-auto">
+    <header style="position:sticky;top:0;z-index:40;border-bottom:1px solid #e5e7eb;background:rgba(255,255,255,0.95);backdrop-filter:blur(4px);">
+        <div style="max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;">
+            <a href="/">
+                <img src="/images/logo.png" alt="جسور" style="height:2.5rem;width:auto;">
             </a>
-            <span class="hidden text-sm text-gray-500 sm:inline">خدمات العمالة المنزلية</span>
+            <span style="font-size:0.875rem;color:#6b7280;">خدمات العمالة المنزلية</span>
         </div>
     </header>
 
     <!-- Progress Steps -->
-    <div class="border-b border-gray-100 bg-white">
-        <div class="mx-auto max-w-6xl px-4 py-4">
-            <ol class="flex items-center gap-2 text-sm">
-                <li class="flex items-center gap-1.5 text-green-600 font-medium">
-                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-xs font-bold">✓</span>
+    <div style="border-bottom:1px solid #f3f4f6;background:#fff;">
+        <div style="max-width:600px;margin:0 auto;padding:0.75rem 1rem;">
+            <ol style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;flex-wrap:wrap;">
+                <li style="display:flex;align-items:center;gap:0.375rem;color:#16a34a;font-weight:600;">
+                    <span style="display:flex;height:1.5rem;width:1.5rem;align-items:center;justify-content:center;border-radius:9999px;background:#dcfce7;font-size:0.7rem;font-weight:700;">✓</span>
                     تفاصيل الخدمة
                 </li>
-                <li class="text-gray-300 mx-1">›</li>
-                <li class="flex items-center gap-1.5 text-green-600 font-medium">
-                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-xs font-bold">✓</span>
+                <li style="color:#d1d5db;margin:0 0.25rem;">›</li>
+                <li style="display:flex;align-items:center;gap:0.375rem;color:#16a34a;font-weight:600;">
+                    <span style="display:flex;height:1.5rem;width:1.5rem;align-items:center;justify-content:center;border-radius:9999px;background:#dcfce7;font-size:0.7rem;font-weight:700;">✓</span>
                     بيانات التواصل
                 </li>
-                <li class="text-gray-300 mx-1">›</li>
-                <li class="flex items-center gap-1.5 text-green-600 font-medium">
-                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-xs font-bold">✓</span>
+                <li style="color:#d1d5db;margin:0 0.25rem;">›</li>
+                <li style="display:flex;align-items:center;gap:0.375rem;color:#16a34a;font-weight:600;">
+                    <span style="display:flex;height:1.5rem;width:1.5rem;align-items:center;justify-content:center;border-radius:9999px;background:#dcfce7;font-size:0.7rem;font-weight:700;">✓</span>
                     الدفع
                 </li>
-                <li class="text-gray-300 mx-1">›</li>
-                <li class="flex items-center gap-1.5 text-[#8B1A3A] font-bold">
-                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-[#8B1A3A] text-xs font-bold text-white">4</span>
+                <li style="color:#d1d5db;margin:0 0.25rem;">›</li>
+                <li style="display:flex;align-items:center;gap:0.375rem;color:#8B1A3A;font-weight:700;">
+                    <span style="display:flex;height:1.5rem;width:1.5rem;align-items:center;justify-content:center;border-radius:9999px;background:#8B1A3A;font-size:0.7rem;font-weight:700;color:#fff;">4</span>
                     التأكيد
                 </li>
             </ol>
         </div>
     </div>
 
-    <main class="mx-auto max-w-md px-4 py-14"
-        x-data="{
-            digits: ['','','','','',''],
-            loading: false,
-            resendLoading: false,
-            resendMsg: '',
-            countdown: 60,
-            canResend: false,
-            get otp() { return this.digits.join(''); },
-            startCountdown() {
-                this.canResend = false;
-                this.countdown = 60;
-                const t = setInterval(() => {
-                    this.countdown--;
-                    if (this.countdown <= 0) { clearInterval(t); this.canResend = true; }
-                }, 1000);
-            },
-            handleInput(i, e) {
-                const v = e.target.value.replace(/\D/g,'');
-                this.digits[i] = v.slice(-1);
-                if (v && i < 5) this.$refs['d'+(i+1)].focus();
-            },
-            handleKeydown(i, e) {
-                if (e.key === 'Backspace' && !this.digits[i] && i > 0) {
-                    this.$refs['d'+(i-1)].focus();
-                }
-            },
-            async resend() {
-                this.resendLoading = true;
-                const r = await fetch('/booking/otp/resend', { method: 'POST' });
-                const d = await r.json();
-                this.resendMsg = d.message;
-                this.resendLoading = false;
-                this.startCountdown();
-                setTimeout(() => this.resendMsg = '', 3000);
-            }
-        }"
-        x-init="startCountdown()">
+    <!-- Main Content -->
+    <main style="max-width:420px;margin:0 auto;padding:2.5rem 1rem 3rem;">
 
-        <div class="text-center mb-8">
-            <!-- أيقونة الرسالة -->
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#8B1A3A]/10">
-                <svg class="h-8 w-8 text-[#8B1A3A]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <!-- Icon + Title -->
+        <div style="text-align:center;margin-bottom:2rem;">
+            <div style="margin:0 auto 1rem;display:flex;height:4rem;width:4rem;align-items:center;justify-content:center;border-radius:9999px;background:rgba(139,26,58,0.1);">
+                <svg style="height:2rem;width:2rem;color:#8B1A3A;" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 8.25h3m-3 3h3m-3 3h3" />
                 </svg>
             </div>
-            <h1 class="text-2xl font-bold text-gray-900">رمز التحقق</h1>
-            <p class="mt-2 text-sm text-gray-500">تم إرسال رمز التحقق المكون من 6 أرقام إلى هاتفك</p>
+            <h1 style="font-size:1.5rem;font-weight:700;color:#111827;margin:0 0 0.5rem;">رمز التحقق</h1>
+            <p style="font-size:0.875rem;color:#6b7280;margin:0;">تم إرسال رمز التحقق المكون من 6 أرقام إلى هاتفك</p>
         </div>
 
-        <!-- رسالة الخطأ -->
-        <div id="error-msg" class="hidden mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 text-center"></div>
+        <!-- Error Message -->
+        <div id="error-msg" style="display:none;margin-bottom:1rem;border-radius:0.5rem;background:#fef2f2;border:1px solid #fecaca;padding:0.75rem 1rem;font-size:0.875rem;color:#b91c1c;text-align:center;"></div>
 
-        <form method="post" action="/booking/otp" @submit="loading = true">
-            <!-- OTP Inputs -->
-            <div class="flex justify-center gap-3 mb-8" dir="ltr">
-                <template x-for="(d, i) in digits" :key="i">
-                    <input
-                        type="text"
-                        inputmode="numeric"
-                        maxlength="1"
-                        :x-ref="'d'+i"
-                        :value="digits[i]"
-                        @input="handleInput(i, $event)"
-                        @keydown="handleKeydown(i, $event)"
-                        class="otp-input"
-                    >
-                </template>
+        <!-- Form -->
+        <form method="post" action="/booking/otp" id="otpForm">
+
+            <!-- Single OTP Input Box -->
+            <div style="margin-bottom:1.5rem;">
+                <label style="display:block;font-size:0.875rem;font-weight:600;color:#374151;margin-bottom:0.5rem;text-align:center;">أدخل الرمز المكون من 6 أرقام</label>
+                <input
+                    type="text"
+                    id="otpInput"
+                    name="otp"
+                    inputmode="numeric"
+                    maxlength="6"
+                    placeholder="● ● ● ● ● ●"
+                    autocomplete="one-time-code"
+                    class="otp-single-input"
+                    oninput="this.value=this.value.replace(/\D/g,'');checkOtp()"
+                >
             </div>
 
-            <!-- Hidden OTP field -->
-            <input type="hidden" name="otp" :value="otp">
-
-            <!-- زر التأكيد -->
-            <div class="flex justify-center">
-                <button type="submit"
-                    class="btn-gradient-continue rounded-xl px-12 py-4 text-base font-bold shadow-md w-full"
-                    :disabled="loading || otp.length < 6">
-                    <span x-show="!loading">تأكيد الرمز</span>
-                    <span x-show="loading" x-cloak>جاري التحقق...</span>
-                </button>
-            </div>
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn"
+                class="btn-gradient-continue"
+                style="width:100%;border-radius:0.75rem;padding:1rem;font-size:1rem;font-weight:700;border:none;cursor:not-allowed;opacity:0.6;"
+                disabled>
+                <span id="btnText">تأكيد الرمز</span>
+            </button>
         </form>
 
-        <!-- إعادة الإرسال -->
-        <div class="mt-6 text-center">
-            <p class="text-sm text-gray-500" x-show="!canResend">
-                يمكنك إعادة الإرسال بعد <span class="font-bold text-[#8B1A3A]" x-text="countdown"></span> ثانية
+        <!-- Resend -->
+        <div style="margin-top:1.5rem;text-align:center;" id="resendSection">
+            <p style="font-size:0.875rem;color:#6b7280;" id="countdownText">
+                يمكنك إعادة الإرسال بعد <span id="countdown" style="font-weight:700;color:#8B1A3A;">60</span> ثانية
             </p>
-            <button
-                x-show="canResend"
-                @click="resend()"
-                :disabled="resendLoading"
-                class="text-sm font-semibold text-[#8B1A3A] hover:underline disabled:opacity-50">
-                <span x-show="!resendLoading">إعادة إرسال الرمز</span>
-                <span x-show="resendLoading" x-cloak>جاري الإرسال...</span>
+            <button id="resendBtn" onclick="resendOtp()"
+                style="display:none;font-size:0.875rem;font-weight:600;color:#8B1A3A;background:none;border:none;cursor:pointer;text-decoration:underline;">
+                إعادة إرسال الرمز
             </button>
-            <p x-show="resendMsg" x-text="resendMsg" class="mt-2 text-sm text-green-600" x-cloak></p>
+            <p id="resendMsg" style="display:none;margin-top:0.5rem;font-size:0.875rem;color:#16a34a;"></p>
         </div>
 
-        <!-- رمز الاختبار -->
-        <div class="mt-8 rounded-lg bg-amber-50 border border-amber-200 p-4 text-center">
-            <p class="text-xs text-amber-700 font-medium">رمز الاختبار</p>
-            <p id="test-otp" class="text-2xl font-bold text-amber-800 font-mono mt-1">------</p>
-            <p class="text-xs text-amber-600 mt-1">هذا الرمز للاختبار فقط</p>
+        <!-- Test OTP Box -->
+        <div style="margin-top:2rem;border-radius:0.75rem;background:#fffbeb;border:1px solid #fde68a;padding:1rem;text-align:center;">
+            <p style="font-size:0.75rem;color:#92400e;font-weight:600;margin:0 0 0.25rem;">رمز الاختبار</p>
+            <p id="test-otp" style="font-size:1.75rem;font-weight:700;color:#78350f;font-family:monospace;margin:0.25rem 0;">------</p>
+            <p style="font-size:0.75rem;color:#b45309;margin:0.25rem 0 0;">هذا الرمز للاختبار فقط</p>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="mt-auto bg-[#6B1230] text-white">
-        <div class="mx-auto max-w-6xl px-4 py-8">
-            <div class="text-center text-xs text-white/60">
-                جسور — جميع الحقوق محفوظة 2026 ©
-            </div>
+    <footer style="background:#6B1230;color:#fff;">
+        <div style="max-width:600px;margin:0 auto;padding:1.5rem 1rem;text-align:center;font-size:0.75rem;color:rgba(255,255,255,0.6);">
+            جسور — جميع الحقوق محفوظة 2026 ©
         </div>
     </footer>
 
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
     <script>
+        // Countdown timer
+        let countdown = 60;
+        const countdownEl = document.getElementById('countdown');
+        const countdownText = document.getElementById('countdownText');
+        const resendBtn = document.getElementById('resendBtn');
+
+        const timer = setInterval(() => {
+            countdown--;
+            countdownEl.textContent = countdown;
+            if (countdown <= 0) {
+                clearInterval(timer);
+                countdownText.style.display = 'none';
+                resendBtn.style.display = 'inline';
+            }
+        }, 1000);
+
+        // Check OTP length to enable button
+        function checkOtp() {
+            const val = document.getElementById('otpInput').value;
+            const btn = document.getElementById('submitBtn');
+            if (val.length === 6) {
+                btn.disabled = false;
+                btn.style.cursor = 'pointer';
+                btn.style.opacity = '1';
+            } else {
+                btn.disabled = true;
+                btn.style.cursor = 'not-allowed';
+                btn.style.opacity = '0.6';
+            }
+        }
+
+        // Form submit
+        document.getElementById('otpForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('submitBtn');
+            document.getElementById('btnText').textContent = 'جاري التحقق...';
+            btn.disabled = true;
+        });
+
+        // Resend OTP
+        async function resendOtp() {
+            resendBtn.disabled = true;
+            resendBtn.textContent = 'جاري الإرسال...';
+            try {
+                const r = await fetch('/booking/otp/resend', { method: 'POST' });
+                const d = await r.json();
+                const msg = document.getElementById('resendMsg');
+                msg.textContent = d.message || 'تم إرسال الرمز';
+                msg.style.display = 'block';
+                setTimeout(() => { msg.style.display = 'none'; }, 3000);
+                // Restart countdown
+                resendBtn.style.display = 'none';
+                countdownText.style.display = 'block';
+                countdown = 60;
+                countdownEl.textContent = 60;
+                const t2 = setInterval(() => {
+                    countdown--;
+                    countdownEl.textContent = countdown;
+                    if (countdown <= 0) {
+                        clearInterval(t2);
+                        countdownText.style.display = 'none';
+                        resendBtn.style.display = 'inline';
+                        resendBtn.disabled = false;
+                        resendBtn.textContent = 'إعادة إرسال الرمز';
+                    }
+                }, 1000);
+            } catch(err) {
+                resendBtn.disabled = false;
+                resendBtn.textContent = 'إعادة إرسال الرمز';
+            }
+        }
+
         // Check for error in URL
         const params = new URLSearchParams(window.location.search);
         if (params.get('error') === 'invalid') {
             const el = document.getElementById('error-msg');
             el.textContent = 'الرمز غير صحيح، يرجى المحاولة مرة أخرى';
-            el.classList.remove('hidden');
+            el.style.display = 'block';
         } else if (params.get('error') === 'expired') {
             const el = document.getElementById('error-msg');
             el.textContent = 'انتهت صلاحية الرمز، يرجى طلب رمز جديد';
-            el.classList.remove('hidden');
+            el.style.display = 'block';
         }
 
         // Load OTP for testing
@@ -224,7 +265,8 @@
             .then(r => r.json())
             .then(d => {
                 document.getElementById('test-otp').textContent = d.otp || '------';
-            });
+            })
+            .catch(() => {});
     </script>
 </body>
 </html>
