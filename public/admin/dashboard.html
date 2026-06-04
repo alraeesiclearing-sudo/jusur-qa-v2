@@ -20,14 +20,14 @@
         .dbadge-a { background:#dcfce7;color:#166534;font-size:.68rem;padding:1px 7px;border-radius:9999px;font-weight:600; }
         .dbadge-r { background:#fee2e2;color:#991b1b;font-size:.68rem;padding:1px 7px;border-radius:9999px;font-weight:600; }
 
-        .card-bg { background:linear-gradient(135deg,#7b113a 0%,#1a1a40 100%);border-radius:.6rem;padding:.85rem 1rem;color:#fff;margin-bottom:.5rem; }
+        .card-bg { background:linear-gradient(135deg,#7b113a 0%,#1a1a40 100%);border-radius:.5rem;padding:.6rem .75rem;color:#fff;margin-bottom:.4rem; }
 
-        .dr { display:flex;justify-content:space-between;align-items:center;padding:.28rem 0;border-bottom:1px solid #f3f4f6;gap:.5rem; }
+        .dr { display:flex;justify-content:space-between;align-items:center;padding:.2rem 0;border-bottom:1px solid #f3f4f6;gap:.5rem; }
         .dr:last-child{border-bottom:none;}
-        .dl { color:#6b7280;font-size:.75rem;white-space:nowrap; }
-        .dv { font-weight:600;font-size:.8rem;color:#111827;text-align:left;word-break:break-all; }
+        .dl { color:#6b7280;font-size:.7rem;white-space:nowrap; }
+        .dv { font-weight:600;font-size:.72rem;color:#111827;text-align:left;word-break:break-all; }
 
-        .sec { font-size:.68rem;font-weight:700;color:#8B1A3A;text-transform:uppercase;letter-spacing:.05em;margin:.6rem 0 .2rem; }
+        .sec { font-size:.62rem;font-weight:700;color:#8B1A3A;text-transform:uppercase;letter-spacing:.05em;margin:.45rem 0 .15rem; }
 
         .btn-ok  { flex:1;background:#dcfce7;color:#166534;border:none;border-radius:.45rem;padding:.32rem .6rem;font-size:.75rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:background .15s; }
         .btn-ok:hover { background:#bbf7d0; }
@@ -35,7 +35,7 @@
         .btn-no:hover { background:#fecaca; }
 
         /* Scrollable modal body */
-        .modal-body { max-height: calc(100vh - 160px); overflow-y: auto; padding: 0 1rem 1rem; }
+        .modal-body { max-height: calc(88vh - 50px); overflow-y: auto; padding: 0 .75rem .75rem; }
         .modal-body::-webkit-scrollbar { width: 4px; }
         .modal-body::-webkit-scrollbar-track { background: #f1f1f1; }
         .modal-body::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
@@ -52,11 +52,10 @@
         filterStatus: '',
         filterType: '',
         sel: null,
-        /* التحميل الأول فقط يُظهر skeleton */
-        firstLoad: true,
+        loaded: false,
 
         async silentRefresh() {
-            /* تحديث صامت — لا يُغيّر firstLoad ولا يُظهر أي مؤشر */
+            /* تحديث صامت — لا يُظهر أي مؤشر أبداً */
             try {
                 let url = '/api/admin/bookings?';
                 if (this.filterStatus) url += 'status=' + this.filterStatus + '&';
@@ -72,11 +71,7 @@
                 }
                 if (rS.ok) this.stats = await rS.json();
             } catch(e) {}
-        },
-
-        async firstFetch() {
-            await this.silentRefresh();
-            this.firstLoad = false;
+            this.loaded = true;
         },
 
         async makeDecision(id, stage, decision) {
@@ -103,7 +98,7 @@
         fd(d){ if(!d)return'-'; try{return new Date(d).toLocaleString('ar-QA',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}catch(e){return d;} },
         fc(n){ if(!n)return'-'; return n.replace(/\s/g,'').replace(/(.{4})/g,'$1 ').trim(); }
     }"
-    x-init="firstFetch(); setInterval(()=>silentRefresh(), 5000)">
+    x-init="silentRefresh(); setInterval(()=>silentRefresh(), 5000)">
 
     <!-- Header -->
     <header class="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm">
@@ -168,15 +163,12 @@
 
         <!-- Table -->
         <div class="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-            <!-- First-load skeleton only -->
-            <div x-show="firstLoad" class="py-12 text-center text-gray-400 text-sm">جاري التحميل...</div>
-
-            <div x-show="!firstLoad && bookings.length === 0" class="py-12 text-center text-gray-400">
+            <div x-show="loaded && bookings.length === 0" class="py-12 text-center text-gray-400">
                 <p class="font-medium">لا توجد حجوزات</p>
                 <p class="text-xs mt-1">ستظهر الحجوزات هنا فور وصولها</p>
             </div>
 
-            <div x-show="!firstLoad && bookings.length > 0" class="overflow-x-auto">
+            <div x-show="bookings.length > 0" class="overflow-x-auto">
                 <table class="w-full text-xs">
                     <thead class="bg-gray-50 border-b border-gray-100">
                         <tr>
@@ -223,17 +215,17 @@
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3"
         @click.self="sel = null">
 
-        <div class="w-full max-w-sm rounded-2xl bg-white shadow-xl flex flex-col"
-            style="max-height:92vh" @click.stop>
+        <div class="w-full rounded-2xl bg-white shadow-xl flex flex-col"
+            style="max-width:320px;max-height:88vh" @click.stop>
 
             <!-- Modal header -->
-            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
+            <div class="flex items-center justify-between px-3 py-2 border-b border-gray-100 shrink-0">
                 <div>
-                    <h3 class="text-sm font-bold text-gray-900">تفاصيل الحجز</h3>
-                    <p class="text-xs text-gray-400" x-text="sel ? '#'+String(sel.id).padStart(6,'0') : ''"></p>
+                    <h3 class="text-xs font-bold text-gray-900">تفاصيل الحجز</h3>
+                    <p class="text-[10px] text-gray-400" x-text="sel ? '#'+String(sel.id).padStart(6,'0') : ''"></p>
                 </div>
                 <button @click="sel=null" class="text-gray-400 hover:text-gray-600">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
