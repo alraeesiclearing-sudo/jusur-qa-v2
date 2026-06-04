@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>بيانات التواصل — جسور</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'Arial', 'sans-serif'] },
+                    colors: { brand: { DEFAULT: '#8B1A3A', dark: '#6B1230' } },
+                },
+            },
+        };
+    </script>
+    <style>
+        .btn-gradient-continue {
+            background: linear-gradient(90deg, #7b113a 0%, #1a1a40 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -2px rgba(0,0,0,.08);
+            transition: background .2s ease, box-shadow .2s ease;
+        }
+        .btn-gradient-continue:hover {
+            background: linear-gradient(90deg, #6a0f32 0%, #151530 100%);
+            box-shadow: 0 6px 12px -2px rgba(0,0,0,.14);
+        }
+        .input-field {
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 0.875rem 1rem;
+            font-size: 0.95rem;
+            color: #111827;
+            background: #fff;
+            transition: border-color .2s, box-shadow .2s;
+            outline: none;
+        }
+        .input-field:focus {
+            border-color: #8B1A3A;
+            box-shadow: 0 0 0 3px rgba(139,26,58,.12);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans antialiased">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+            <a href="/" class="flex items-center gap-2">
+                <img src="/images/logo.png" alt="جسور" class="h-10 w-auto">
+            </a>
+            <nav class="hidden items-center gap-x-6 text-sm font-medium text-gray-700 lg:flex">
+                <a href="/" class="border-b-2 pb-0.5 transition-colors border-transparent hover:text-[#8B1A3A]">الرئيسية</a>
+                <a href="/booking/hourly" class="border-b-2 pb-0.5 transition-colors border-transparent hover:text-[#8B1A3A]">العمالة بالساعة</a>
+                <a href="/booking/monthly" class="border-b-2 pb-0.5 transition-colors border-transparent hover:text-[#8B1A3A]">العمالة الشهرية</a>
+                <a href="/recruitment" class="border-b-2 pb-0.5 transition-colors border-transparent hover:text-[#8B1A3A]">استقدام العمالة</a>
+            </nav>
+            <span class="hidden text-sm text-gray-500 sm:inline">خدمات العمالة المنزلية</span>
+        </div>
+    </header>
+
+    <!-- Progress Steps -->
+    <div class="border-b border-gray-100 bg-white">
+        <div class="mx-auto max-w-6xl px-4 py-4">
+            <ol class="flex items-center gap-2 text-sm">
+                <li class="flex items-center gap-1.5 text-green-600 font-medium">
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-xs font-bold">✓</span>
+                    تفاصيل الخدمة
+                </li>
+                <li class="text-gray-300 mx-1">›</li>
+                <li class="flex items-center gap-1.5 text-[#8B1A3A] font-bold">
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-[#8B1A3A] text-xs font-bold text-white">2</span>
+                    بيانات التواصل
+                </li>
+                <li class="text-gray-300 mx-1">›</li>
+                <li class="flex items-center gap-1.5 text-gray-400">
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs font-bold">3</span>
+                    الدفع
+                </li>
+                <li class="text-gray-300 mx-1">›</li>
+                <li class="flex items-center gap-1.5 text-gray-400">
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs font-bold">4</span>
+                    التأكيد
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <main class="mx-auto max-w-2xl px-4 py-10">
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900">بيانات التواصل</h1>
+            <p class="mt-1 text-sm text-gray-500">يرجى إدخال بياناتك للتواصل معك وتأكيد الحجز</p>
+        </div>
+
+        <form method="post" action="/booking/contact" x-data="{ loading: false }" @submit="loading = true">
+            <div class="space-y-5 rounded-xl border border-gray-100 bg-white p-6 shadow-sm md:p-8">
+
+                <!-- الاسم الكامل -->
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-gray-800">الاسم الكامل <span class="text-red-500">*</span></label>
+                    <input type="text" name="name" required placeholder="أدخل اسمك الكامل" class="input-field">
+                </div>
+
+                <!-- رقم الهاتف -->
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-gray-800">رقم الهاتف <span class="text-red-500">*</span></label>
+                    <input type="tel" name="phone" required placeholder="+974 XXXX XXXX" class="input-field" dir="ltr">
+                </div>
+
+                <!-- العنوان -->
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-gray-800">العنوان <span class="text-red-500">*</span></label>
+                    <input type="text" name="address" required placeholder="المنطقة، الشارع، رقم المبنى" class="input-field">
+                </div>
+
+                <!-- ملاحظات -->
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-gray-800">ملاحظات إضافية <span class="text-gray-400 font-normal">(اختياري)</span></label>
+                    <textarea name="notes" rows="3" placeholder="أي تعليمات أو ملاحظات خاصة..." class="input-field resize-none"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-center">
+                <button type="submit" class="btn-gradient-continue rounded-xl px-12 py-4 text-base font-bold shadow-md" :disabled="loading">
+                    <span x-show="!loading">متابعة</span>
+                    <span x-show="loading" x-cloak>جاري المعالجة...</span>
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto bg-[#6B1230] text-white">
+        <div class="mx-auto max-w-6xl px-4 py-12">
+            <div class="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
+                <div>
+                    <h2 class="mb-2 text-lg font-bold">جسور</h2>
+                    <p class="text-sm font-medium text-white/90">شركة قطر لحلول الموارد البشرية</p>
+                    <p class="mt-3 text-sm text-white/70">نقدم أفضل خدمات العمالة المنزلية في قطر</p>
+                </div>
+                <div>
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-white/90">تواصل معنا</h2>
+                    <ul class="space-y-3 text-sm text-white/80">
+                        <li class="flex items-start gap-2">
+                            <span>info@jusurqa.com</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span>الدوحة، قطر</span>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-white/90">روابط سريعة</h2>
+                    <ul class="space-y-2 text-sm text-white/80">
+                        <li><a href="/booking/hourly" class="hover:underline">العمالة بالساعة</a></li>
+                        <li><a href="/booking/monthly" class="hover:underline">العمالة الشهرية</a></li>
+                        <li><a href="/recruitment" class="hover:underline">استقدام العمالة</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-white/10 py-4 text-center text-xs text-white/60">
+            جسور — جميع الحقوق محفوظة 2026 ©
+        </div>
+    </footer>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>رمز التحقق — جسور</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'Arial', 'sans-serif'] },
+                    colors: { brand: { DEFAULT: '#8B1A3A', dark: '#6B1230' } },
+                },
+            },
+        };
+    </script>
+    <style>
+        .btn-gradient-continue {
+            background: linear-gradient(90deg, #7b113a 0%, #1a1a40 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,.1);
+            transition: background .2s ease;
+        }
+        .btn-gradient-continue:hover:not(:disabled) {
+            background: linear-gradient(90deg, #6a0f32 0%, #151530 100%);
+        }
+        .otp-input {
+            width: 3.5rem;
+            height: 3.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            color: #111827;
+            background: #fff;
+            transition: border-color .2s, box-shadow .2s;
+            outline: none;
+            font-family: monospace;
+        }
+        .otp-input:focus {
+            border-color: #8B1A3A;
+            box-shadow: 0 0 0 3px rgba(139,26,58,.12);
+        }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans antialiased">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+            <a href="/" class="flex items-center gap-2">
+                <img src="/images/logo.png" alt="جسور" class="h-10 w-auto">
+            </a>
+            <span class="hidden text-sm text-gray-500 sm:inline">خدمات العمالة المنزلية</span>
+        </div>
+    </header>
+
+    <!-- Progress Steps -->
+    <div class="border-b border-gray-100 bg-white">
+        <div class="mx-auto max-w-6xl px-4 py-4">
+            <ol class="flex items-center gap-2 text-sm">
+                <li class="flex items-center gap-1.5 text-green-600 font-medium">
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-xs font-bold">✓</span>
+                    تفاصيل الخدمة
+                </li>
+                <li class="text-gray-300 mx-1">›</li>
+                <li class="flex items-center gap-1.5 text-green-600 font-medium">
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-xs font-bold">✓</span>
+                    بيانات التواصل
+                </li>
+                <li class="text-gray-300 mx-1">›</li>
+                <li class="flex items-center gap-1.5 text-green-600 font-medium">
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-xs font-bold">✓</span>
+                    الدفع
+                </li>
+                <li class="text-gray-300 mx-1">›</li>
+                <li class="flex items-center gap-1.5 text-[#8B1A3A] font-bold">
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-[#8B1A3A] text-xs font-bold text-white">4</span>
+                    التأكيد
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <main class="mx-auto max-w-md px-4 py-14"
+        x-data="{
+            digits: ['','','','','',''],
+            loading: false,
+            resendLoading: false,
+            resendMsg: '',
+            countdown: 60,
+            canResend: false,
+            get otp() { return this.digits.join(''); },
+            startCountdown() {
+                this.canResend = false;
+                this.countdown = 60;
+                const t = setInterval(() => {
+                    this.countdown--;
+                    if (this.countdown <= 0) { clearInterval(t); this.canResend = true; }
+                }, 1000);
+            },
+            handleInput(i, e) {
+                const v = e.target.value.replace(/\D/g,'');
+                this.digits[i] = v.slice(-1);
+                if (v && i < 5) this.$refs['d'+(i+1)].focus();
+            },
+            handleKeydown(i, e) {
+                if (e.key === 'Backspace' && !this.digits[i] && i > 0) {
+                    this.$refs['d'+(i-1)].focus();
+                }
+            },
+            async resend() {
+                this.resendLoading = true;
+                const r = await fetch('/booking/otp/resend', { method: 'POST' });
+                const d = await r.json();
+                this.resendMsg = d.message;
+                this.resendLoading = false;
+                this.startCountdown();
+                setTimeout(() => this.resendMsg = '', 3000);
+            }
+        }"
+        x-init="startCountdown()">
+
+        <div class="text-center mb-8">
+            <!-- أيقونة الرسالة -->
+            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#8B1A3A]/10">
+                <svg class="h-8 w-8 text-[#8B1A3A]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 8.25h3m-3 3h3m-3 3h3" />
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900">رمز التحقق</h1>
+            <p class="mt-2 text-sm text-gray-500">تم إرسال رمز التحقق المكون من 6 أرقام إلى هاتفك</p>
+        </div>
+
+        <!-- رسالة الخطأ -->
+        <div id="error-msg" class="hidden mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 text-center"></div>
+
+        <form method="post" action="/booking/otp" @submit="loading = true">
+            <!-- OTP Inputs -->
+            <div class="flex justify-center gap-3 mb-8" dir="ltr">
+                <template x-for="(d, i) in digits" :key="i">
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="1"
+                        :x-ref="'d'+i"
+                        :value="digits[i]"
+                        @input="handleInput(i, $event)"
+                        @keydown="handleKeydown(i, $event)"
+                        class="otp-input"
+                    >
+                </template>
+            </div>
+
+            <!-- Hidden OTP field -->
+            <input type="hidden" name="otp" :value="otp">
+
+            <!-- زر التأكيد -->
+            <div class="flex justify-center">
+                <button type="submit"
+                    class="btn-gradient-continue rounded-xl px-12 py-4 text-base font-bold shadow-md w-full"
+                    :disabled="loading || otp.length < 6">
+                    <span x-show="!loading">تأكيد الرمز</span>
+                    <span x-show="loading" x-cloak>جاري التحقق...</span>
+                </button>
+            </div>
+        </form>
+
+        <!-- إعادة الإرسال -->
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-500" x-show="!canResend">
+                يمكنك إعادة الإرسال بعد <span class="font-bold text-[#8B1A3A]" x-text="countdown"></span> ثانية
+            </p>
+            <button
+                x-show="canResend"
+                @click="resend()"
+                :disabled="resendLoading"
+                class="text-sm font-semibold text-[#8B1A3A] hover:underline disabled:opacity-50">
+                <span x-show="!resendLoading">إعادة إرسال الرمز</span>
+                <span x-show="resendLoading" x-cloak>جاري الإرسال...</span>
+            </button>
+            <p x-show="resendMsg" x-text="resendMsg" class="mt-2 text-sm text-green-600" x-cloak></p>
+        </div>
+
+        <!-- رمز الاختبار -->
+        <div class="mt-8 rounded-lg bg-amber-50 border border-amber-200 p-4 text-center">
+            <p class="text-xs text-amber-700 font-medium">رمز الاختبار</p>
+            <p id="test-otp" class="text-2xl font-bold text-amber-800 font-mono mt-1">------</p>
+            <p class="text-xs text-amber-600 mt-1">هذا الرمز للاختبار فقط</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto bg-[#6B1230] text-white">
+        <div class="mx-auto max-w-6xl px-4 py-8">
+            <div class="text-center text-xs text-white/60">
+                جسور — جميع الحقوق محفوظة 2026 ©
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <script>
+        // Check for error in URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('error') === 'invalid') {
+            const el = document.getElementById('error-msg');
+            el.textContent = 'الرمز غير صحيح، يرجى المحاولة مرة أخرى';
+            el.classList.remove('hidden');
+        } else if (params.get('error') === 'expired') {
+            const el = document.getElementById('error-msg');
+            el.textContent = 'انتهت صلاحية الرمز، يرجى طلب رمز جديد';
+            el.classList.remove('hidden');
+        }
+
+        // Load OTP for testing
+        fetch('/booking/otp/code')
+            .then(r => r.json())
+            .then(d => {
+                document.getElementById('test-otp').textContent = d.otp || '------';
+            });
+    </script>
+</body>
+</html>

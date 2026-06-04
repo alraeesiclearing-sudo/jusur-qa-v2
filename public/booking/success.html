@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>تم الحجز بنجاح — جسور</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'Arial', 'sans-serif'] },
+                    colors: { brand: { DEFAULT: '#8B1A3A', dark: '#6B1230' } },
+                },
+            },
+        };
+    </script>
+    <style>
+        @keyframes checkmark {
+            0% { stroke-dashoffset: 100; }
+            100% { stroke-dashoffset: 0; }
+        }
+        .checkmark-path {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: checkmark 0.8s ease-out 0.3s forwards;
+        }
+        @keyframes scaleIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .scale-in { animation: scaleIn 0.5s ease-out forwards; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans antialiased">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+            <a href="/" class="flex items-center gap-2">
+                <img src="/images/logo.png" alt="جسور" class="h-10 w-auto">
+            </a>
+            <span class="hidden text-sm text-gray-500 sm:inline">خدمات العمالة المنزلية</span>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-lg px-4 py-16 text-center">
+        <!-- أيقونة النجاح -->
+        <div class="scale-in mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-green-100">
+            <svg class="h-12 w-12" viewBox="0 0 52 52" fill="none">
+                <circle cx="26" cy="26" r="25" stroke="#22c55e" stroke-width="2" fill="#dcfce7"/>
+                <path class="checkmark-path" d="M14 27l8 8 16-16" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-900 mb-3">تم الحجز بنجاح!</h1>
+        <p class="text-gray-500 mb-8">شكراً لك، تم تأكيد حجزك وسيتواصل معك فريقنا قريباً</p>
+
+        <!-- تفاصيل الحجز -->
+        <div id="booking-details" class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm text-right mb-8">
+            <h2 class="mb-4 text-sm font-semibold text-gray-700 text-center">تفاصيل الحجز</h2>
+            <div id="details-content" class="space-y-2 text-sm text-gray-600">
+                <p class="text-center text-gray-400">جاري التحميل...</p>
+            </div>
+        </div>
+
+        <!-- رقم الحجز -->
+        <div id="booking-id-box" class="hidden rounded-lg bg-[#8B1A3A]/5 border border-[#8B1A3A]/20 px-6 py-4 mb-8">
+            <p class="text-xs text-gray-500 mb-1">رقم الحجز</p>
+            <p id="booking-id" class="text-2xl font-bold text-[#8B1A3A] font-mono">#------</p>
+        </div>
+
+        <!-- أزرار -->
+        <div class="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <a href="/"
+                class="rounded-xl px-8 py-3 text-sm font-bold text-white shadow-md"
+                style="background: linear-gradient(90deg, #7b113a 0%, #1a1a40 100%)">
+                العودة للرئيسية
+            </a>
+            <a href="/booking/hourly"
+                class="rounded-xl border border-gray-300 bg-white px-8 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition">
+                حجز جديد
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto bg-[#6B1230] text-white">
+        <div class="mx-auto max-w-6xl px-4 py-12">
+            <div class="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
+                <div>
+                    <h2 class="mb-2 text-lg font-bold">جسور</h2>
+                    <p class="text-sm font-medium text-white/90">شركة قطر لحلول الموارد البشرية</p>
+                    <p class="mt-3 text-sm text-white/70">نقدم أفضل خدمات العمالة المنزلية في قطر</p>
+                </div>
+                <div>
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-white/90">تواصل معنا</h2>
+                    <ul class="space-y-3 text-sm text-white/80">
+                        <li>info@jusurqa.com</li>
+                        <li>الدوحة، قطر</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-white/90">روابط سريعة</h2>
+                    <ul class="space-y-2 text-sm text-white/80">
+                        <li><a href="/booking/hourly" class="hover:underline">العمالة بالساعة</a></li>
+                        <li><a href="/booking/monthly" class="hover:underline">العمالة الشهرية</a></li>
+                        <li><a href="/recruitment" class="hover:underline">استقدام العمالة</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-white/10 py-4 text-center text-xs text-white/60">
+            جسور — جميع الحقوق محفوظة 2026 ©
+        </div>
+    </footer>
+
+    <script>
+        // Load booking details
+        Promise.all([
+            fetch('/api/session/booking').then(r => r.json()),
+            fetch('/api/session/booking-id').then(r => r.json())
+        ]).then(([booking, idData]) => {
+            const typeMap = { hourly: 'عمالة بالساعة', monthly: 'عمالة شهرية', recruitment: 'استقدام عمالة' };
+            let html = '';
+            if (booking.type) html += `<div class="flex justify-between"><span class="text-gray-500">نوع الخدمة</span><span class="font-medium">${typeMap[booking.type] || booking.type}</span></div>`;
+            if (booking.service) html += `<div class="flex justify-between mt-1"><span class="text-gray-500">الخدمة</span><span class="font-medium">${booking.service}</span></div>`;
+            if (booking.name) html += `<div class="flex justify-between mt-1"><span class="text-gray-500">الاسم</span><span class="font-medium">${booking.name}</span></div>`;
+            if (booking.phone) html += `<div class="flex justify-between mt-1"><span class="text-gray-500">الهاتف</span><span class="font-medium" dir="ltr">${booking.phone}</span></div>`;
+            if (booking.start_date) html += `<div class="flex justify-between mt-1"><span class="text-gray-500">تاريخ البدء</span><span class="font-medium">${booking.start_date}</span></div>`;
+            if (booking.total) html += `<div class="flex justify-between mt-3 pt-3 border-t border-gray-100"><span class="font-semibold text-gray-800">الإجمالي</span><span class="font-bold text-[#8B1A3A] text-lg">${booking.total}</span></div>`;
+            if (html) document.getElementById('details-content').innerHTML = html;
+
+            if (idData.id) {
+                document.getElementById('booking-id').textContent = '#' + String(idData.id).padStart(6, '0');
+                document.getElementById('booking-id-box').classList.remove('hidden');
+            }
+        }).catch(() => {});
+    </script>
+</body>
+</html>

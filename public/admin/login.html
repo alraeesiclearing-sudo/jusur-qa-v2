@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>لوحة الإدارة — جسور</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'Arial', 'sans-serif'] },
+                    colors: { brand: { DEFAULT: '#8B1A3A', dark: '#6B1230' } },
+                },
+            },
+        };
+    </script>
+    <style>
+        .btn-gradient {
+            background: linear-gradient(90deg, #7b113a 0%, #1a1a40 100%);
+            color: #fff;
+            transition: opacity .2s;
+        }
+        .btn-gradient:hover { opacity: .9; }
+        .input-field {
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 0.875rem 1rem;
+            font-size: 0.95rem;
+            color: #111827;
+            background: #fff;
+            transition: border-color .2s, box-shadow .2s;
+            outline: none;
+        }
+        .input-field:focus {
+            border-color: #8B1A3A;
+            box-shadow: 0 0 0 3px rgba(139,26,58,.12);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans antialiased flex items-center justify-center">
+
+    <div class="w-full max-w-sm px-4">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <img src="/images/logo.png" alt="جسور" class="h-14 w-auto mx-auto mb-4">
+            <h1 class="text-xl font-bold text-gray-900">لوحة إدارة جسور</h1>
+            <p class="text-sm text-gray-500 mt-1">تسجيل دخول المشرف</p>
+        </div>
+
+        <!-- Error -->
+        <div id="error-msg" class="hidden mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 text-center">
+            كلمة المرور غير صحيحة
+        </div>
+
+        <form method="post" action="/admin/login" class="rounded-xl border border-gray-100 bg-white p-8 shadow-sm">
+            <div class="mb-5">
+                <label class="mb-2 block text-sm font-semibold text-gray-800">كلمة المرور</label>
+                <input type="password" name="password" required placeholder="أدخل كلمة المرور" class="input-field" autofocus>
+            </div>
+            <button type="submit" class="btn-gradient w-full rounded-xl py-3.5 text-sm font-bold shadow-md">
+                تسجيل الدخول
+            </button>
+        </form>
+
+        <p class="mt-6 text-center text-xs text-gray-400">
+            <a href="/" class="hover:text-[#8B1A3A]">← العودة للموقع</a>
+        </p>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('error') === '1') {
+            document.getElementById('error-msg').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

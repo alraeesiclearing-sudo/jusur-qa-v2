@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>خدمة استقدام العمالة المنزلية — جسور</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            DEFAULT: '#8B1A3A',
+                            dark: '#6B1230',
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+    
+        <style>
+        /* Continue / primary CTA — maroon (left) → dark navy (right), per brand mockup */
+        .btn-gradient-continue {
+            background: linear-gradient(90deg, #7b113a 0%, #1a1a40 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+            transition: background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+        .btn-gradient-continue:hover:not(:disabled) {
+            background: linear-gradient(90deg, #6a0f32 0%, #151530 100%);
+            box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.14);
+        }
+    </style>
+
+    </head>
+<body class="min-h-screen bg-[#f5f5f5] font-sans text-gray-900 antialiased">
+
+    
+    <header class="border-b border-gray-200 bg-white">
+        <div class="mx-auto flex  items-center justify-between gap-4 px-4 py-4">
+
+            
+            <div class="flex shrink-0 items-center gap-3">
+                <a
+                    href="/locale/en.html"
+                    aria-label="شعار جسور"
+                >
+                    <img
+                        src="/images/logo.png"
+                        alt=""
+                        width="120"
+                        height="36"
+                        loading="eager"
+                        decoding="async"
+                    >
+                </a>
+            </div>
+
+            
+            <nav class="hidden items-center gap-x-6 text-sm font-medium text-gray-700 lg:flex" aria-label="Primary">
+                <a href="/locale/en.html" class="border-b-2 pb-0.5 transition-colors border-transparent hover:text-[#8B1A3A]">الرئيسية</a>
+                <a href="/booking/hourly" class="border-b-2 pb-0.5 transition-colors border-transparent hover:text-[#8B1A3A]">العمالة بالساعة</a>
+                <a href="/booking/monthly" class="border-b-2 pb-0.5 transition-colors border-transparent hover:text-[#8B1A3A]">العمالة الشهرية</a>
+                <a href="/recruitment" class="border-b-2 pb-0.5 transition-colors border-[#8B1A3A] text-[#8B1A3A]">استقدام العمالة</a>
+            </nav>
+
+            
+            <div class="flex shrink-0 items-center gap-3">
+                                    <a
+                        href="/locale/en.html"
+                        class="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+                        aria-label="التبديل إلى واجهة الإنجليزية"
+                    >
+                        
+                        <svg class="h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                        </svg>
+                        EN
+                    </a>
+                                <span class="hidden text-sm text-gray-500 sm:inline">خدمات العمالة المنزلية</span>
+            </div>
+        </div>
+
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-10">
+                    
+    <div class="mb-10 text-center">
+        <h1 class="bg-gradient-to-r from-[#8A1538] to-black bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">خدمة استقدام العمالة المنزلية</h1>
+        <p class="mt-3 text-gray-600">نوفر لك أفضل العمالة المنزلية المؤهلة من مختلف الجنسيات.</p>
+    </div>
+
+    <section class="mb-10 rounded-xl border border-gray-100 bg-white p-8 text-center shadow-sm">
+        <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#8B1A3A] text-white">
+            <svg class="h-7 w-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-900">خدمة مخصصة لاستقدام العمالة</h2>
+        <p class="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-gray-600">
+            نقدم خدمات استقدام عمالة منزلية مؤهلة ومدربة من دول مختلفة. يساعدك فريقنا الخبير في اختيار العامل المناسب لاحتياجاتك وإكمال جميع الإجراءات القانونية.
+        </p>
+    </section>
+
+    <form method="post" action="/recruitment" x-data="{ nationality: null }">
+    <section class="mb-10">
+        <h2 class="mb-6 text-center text-xl font-bold text-gray-900">الجنسيات المتاحة</h2>
+        <div class="mx-auto flex max-w-4xl flex-wrap justify-center gap-3">
+                            <button type="button" @click="nationality = 'eth'" :class="nationality === 'eth' ? 'border-2 border-[#8B1A3A] bg-[#8B1A3A]/5' : 'border border-gray-200 bg-gray-50'" class="min-w-[8rem] rounded-lg px-4 py-3 text-sm font-medium text-gray-900 shadow-sm transition">
+                    إثيوبيا
+                </button>
+                            <button type="button" @click="nationality = 'id'" :class="nationality === 'id' ? 'border-2 border-[#8B1A3A] bg-[#8B1A3A]/5' : 'border border-gray-200 bg-gray-50'" class="min-w-[8rem] rounded-lg px-4 py-3 text-sm font-medium text-gray-900 shadow-sm transition">
+                    إندونيسيا
+                </button>
+                            <button type="button" @click="nationality = 'ph'" :class="nationality === 'ph' ? 'border-2 border-[#8B1A3A] bg-[#8B1A3A]/5' : 'border border-gray-200 bg-gray-50'" class="min-w-[8rem] rounded-lg px-4 py-3 text-sm font-medium text-gray-900 shadow-sm transition">
+                    الفلبين
+                </button>
+                            <button type="button" @click="nationality = 'in'" :class="nationality === 'in' ? 'border-2 border-[#8B1A3A] bg-[#8B1A3A]/5' : 'border border-gray-200 bg-gray-50'" class="min-w-[8rem] rounded-lg px-4 py-3 text-sm font-medium text-gray-900 shadow-sm transition">
+                    الهند
+                </button>
+                    </div>
+        <input type="hidden" name="nationality" :value="nationality ?? ''">
+    </section>
+
+    <!-- زر المتابعة -->
+    <div class="mt-6 flex justify-center" x-show="nationality !== null">
+        <button type="submit" class="btn-gradient-continue rounded-xl px-10 py-4 text-base font-bold shadow-md">
+            متابعة
+        </button>
+    </div>
+    </form>
+
+    <section class="mb-10 rounded-xl border border-gray-100 bg-white p-6 shadow-sm md:p-8">
+        <h2 class="mb-6 text-start text-xl font-bold text-gray-900">ماذا تشمل الخدمة</h2>
+        <div class="grid gap-8 md:grid-cols-2 md:gap-12">
+            <div>
+                <h3 class="mb-4 text-lg font-semibold text-[#8B1A3A]">الإجراءات القانونية</h3>
+                <ul class="space-y-2 text-sm text-gray-700">
+                    <li class="flex gap-2"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B1A3A]"></span>طلب التأشيرة وتصريح الإقامة</li>
+                    <li class="flex gap-2"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B1A3A]"></span>الفحص الطبي الشامل</li>
+                    <li class="flex gap-2"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B1A3A]"></span>التأمين الصحي</li>
+                    <li class="flex gap-2"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B1A3A]"></span>إعداد العقد القانوني</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="mb-4 text-lg font-semibold text-[#8B1A3A]">التأهيل والتدريب</h3>
+                <ul class="space-y-2 text-sm text-gray-700">
+                    <li class="flex gap-2"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B1A3A]"></span>تدريب على التنظيف وأعمال المنزل</li>
+                    <li class="flex gap-2"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B1A3A]"></span>تدريب على الطبخ والتحضير</li>
+                    <li class="flex gap-2"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B1A3A]"></span>تدريب على رعاية الأطفال وكبار السن</li>
+                    <li class="flex gap-2"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B1A3A]"></span>اللغة العربية الأساسية</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="rounded-xl border border-gray-100 bg-white p-8 shadow-sm">
+        <h2 class="mb-8 text-center text-xl font-bold text-gray-900">خطوات الحصول على الخدمة</h2>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="text-center">
+                <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#8B1A3A] text-sm font-bold text-white">1</div>
+                <p class="text-sm font-semibold text-[#8B1A3A]">التواصل</p>
+                <p class="mt-2 text-sm text-gray-600">تواصل معنا وحدد احتياجاتك</p>
+            </div>
+            <div class="text-center">
+                <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#8B1A3A] text-sm font-bold text-white">2</div>
+                <p class="text-sm font-semibold text-[#8B1A3A]">الاختيار</p>
+                <p class="mt-2 text-sm text-gray-600">اختيار القوى العاملة المناسبة</p>
+            </div>
+            <div class="text-center">
+                <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#8B1A3A] text-sm font-bold text-white">3</div>
+                <p class="text-sm font-semibold text-[#8B1A3A]">الإجراءات</p>
+                <p class="mt-2 text-sm text-gray-600">إكمال الإجراءات القانونية</p>
+            </div>
+            <div class="text-center">
+                <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#8B1A3A] text-sm font-bold text-white">4</div>
+                <p class="text-sm font-semibold text-[#8B1A3A]">الوصول</p>
+                <p class="mt-2 text-sm text-gray-600">وصول العمالة وبدء العمل</p>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    
+    <footer class="mt-auto bg-[#6B1230] text-white">
+        <div class="mx-auto max-w-6xl px-4 py-12">
+            <div class="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
+
+                
+                <div>
+                    <h2 class="mb-2 text-lg font-bold">جسور</h2>
+                    <p class="text-sm font-medium text-white/90">شركة قطر لحلول الموارد البشرية</p>
+                    <p class="mt-3 text-sm text-white/70">نقدم أفضل خدمات العمالة المنزلية في قطر</p>
+                </div>
+
+                
+                <div>
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-white/90">تواصل معنا</h2>
+                    <ul class="space-y-3 text-sm text-white/80">
+                        <li class="flex items-start gap-2">
+                            <svg class="mt-0.5 h-4 w-4 shrink-0 text-white/60" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                            </svg>
+                            <a href="https://jusurqa.com/cdn-cgi/l/email-protection#1c75727a735c76696f73736e326d7d" class="hover:underline"><span class="__cf_email__" data-cfemail="d9b0b7bfb699b3acaab6b6abf7a8b8">[email&#160;protected]</span></a>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="mt-0.5 h-4 w-4 shrink-0 text-white/60" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.125-9 13.5-9 13.5S1.5 17.625 1.5 10.5a9 9 0 1117 0z" />
+                            </svg>
+                            <span>الدوحة، قطر</span>
+                        </li>
+                    </ul>
+                </div>
+
+                
+                <div>
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-white/90">روابط سريعة</h2>
+                    <ul class="space-y-2 text-sm text-white/80">
+                        <li><a href="/booking/hourly" class="hover:underline">العمالة بالساعة</a></li>
+                        <li><a href="/booking/monthly" class="hover:underline">العمالة الشهرية</a></li>
+                        <li><a href="/recruitment" class="hover:underline">استقدام العمالة</a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        <div class="border-t border-white/10 py-4 text-center text-xs text-white/60">
+            جسور — جميع الحقوق محفوظة 2026 ©
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    </body>
+</html>
