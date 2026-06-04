@@ -35,7 +35,7 @@
         .btn-no:hover { background:#fecaca; }
 
         /* Scrollable modal body */
-        .modal-body { max-height: calc(88vh - 50px); overflow-y: auto; padding: 0 .75rem .75rem; }
+        .modal-body { max-height: calc(72vh - 48px); overflow-y: auto; padding: 0 1rem 1rem; }
         .modal-body::-webkit-scrollbar { width: 4px; }
         .modal-body::-webkit-scrollbar-track { background: #f1f1f1; }
         .modal-body::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
@@ -216,7 +216,7 @@
         @click.self="sel = null">
 
         <div class="w-full rounded-2xl bg-white shadow-xl flex flex-col"
-            style="max-width:320px;max-height:88vh" @click.stop>
+            style="width:480px;max-width:96vw;max-height:72vh" @click.stop>
 
             <!-- Modal header -->
             <div class="flex items-center justify-between px-3 py-2 border-b border-gray-100 shrink-0">
