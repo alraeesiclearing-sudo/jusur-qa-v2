@@ -37,11 +37,18 @@ db.serialize(() => {
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+// Trust proxy for Render (HTTPS)
+app.set('trust proxy', 1);
 app.use(session({
   secret: process.env.SESSION_SECRET || 'jusur-secret-2026',
-  resave: false,
+  resave: true,
   saveUninitialized: true,
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 24 * 60 * 60 * 1000
+  }
 }));
 
 // Static files
