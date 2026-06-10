@@ -41,54 +41,59 @@
         }
         [x-cloak] { display: none !important; }
         
-        .team-card {
+        .cv-card {
             border: 2px solid transparent;
             transition: all 0.3s ease;
             cursor: pointer;
+            background: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        .team-card:hover {
+        .cv-card:hover {
             border-color: #8A1538;
             transform: translateY(-4px);
             box-shadow: 0 8px 16px rgba(138, 21, 56, 0.15);
         }
-        .team-card.selected {
+        .cv-card.selected {
             border-color: #8A1538;
             background-color: rgba(138, 21, 56, 0.05);
         }
         
-        .skill-bar {
-            background-color: #e5e7eb;
-            border-radius: 0.5rem;
-            height: 6px;
-            overflow: hidden;
-        }
-        .skill-bar-fill {
-            background: linear-gradient(90deg, #8A1538 0%, #6a0f32 100%);
-            height: 100%;
-            transition: width 0.3s ease;
+        .cv-image {
+            width: 100%;
+            height: auto;
+            display: block;
         }
         
-        .stars {
-            color: #FFD700;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
+        .select-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(138, 21, 56, 0.1);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem;
         }
         
-        .view-details-btn {
-            background-color: #8A1538;
+        .cv-card.selected .select-overlay {
+            display: flex;
+        }
+        
+        .select-checkmark {
+            background: #8A1538;
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: background-color 0.2s ease;
-            text-align: center;
-            cursor: pointer;
-            display: inline-block;
-        }
-        
-        .view-details-btn:hover {
-            background-color: #6a0f32;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -132,107 +137,16 @@
             <input type="hidden" name="worker_id" :value="selectedWorker?.id ?? ''">
             <input type="hidden" name="worker_name" :value="selectedWorker?.name ?? ''">
 
-            <!-- Team Cards Grid -->
+            <!-- CV Cards Grid -->
             <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <template x-for="worker in workers" :key="worker.id">
-                    <div @click="selectWorker(worker)" :class="selectedWorker?.id === worker.id ? 'selected' : ''" class="team-card rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                        <!-- Worker Image -->
-                        <div class="mb-4 flex justify-center">
-                            <div class="relative h-32 w-32 overflow-hidden rounded-full border-4 border-blue-600">
-                                <img :src="worker.image" :alt="worker.name" class="h-full w-full object-cover">
-                            </div>
-                        </div>
-
-                        <!-- Worker Name & Nationality -->
-                        <div class="mb-3 text-center">
-                            <h3 class="text-lg font-bold text-gray-900" x-text="worker.name"></h3>
-                            <p class="mt-1 text-sm text-gray-600">
-                                <span x-text="worker.nationality"></span>
-                                <span class="ml-2" x-text="worker.flag"></span>
-                            </p>
-                        </div>
-
-                        <!-- Rating Stars -->
-                        <div class="mb-3 text-center">
-                            <div class="stars">★★★★★</div>
-                            <p class="text-xs text-gray-600 mt-1">تقييم خمس نجوم</p>
-                        </div>
-
-                        <!-- View Details Button -->
-                        <div class="mb-4 text-center">
-                            <button type="button" @click.stop="openDetails(worker)" class="view-details-btn">
-                                عرض التفاصيل
-                            </button>
-                        </div>
-
-                        <!-- Personal Details -->
-                        <div class="mb-4 space-y-2 border-t border-gray-100 pt-4">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">العمر:</span>
-                                <span class="font-medium text-gray-900" x-text="worker.age"></span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">الحالة الاجتماعية:</span>
-                                <span class="font-medium text-gray-900" x-text="worker.marital_status"></span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">اللغة:</span>
-                                <span class="font-medium text-gray-900" x-text="worker.language"></span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">الديانة:</span>
-                                <span class="font-medium text-gray-900" x-text="worker.religion"></span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">رقم الجواز:</span>
-                                <span class="font-medium text-gray-900" x-text="worker.passport"></span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">كود الموظف:</span>
-                                <span class="font-medium text-gray-900" x-text="worker.code"></span>
-                            </div>
-                        </div>
-
-                        <!-- Experience -->
-                        <div class="mb-4 border-t border-gray-100 pt-4">
-                            <p class="text-sm font-semibold text-gray-900 mb-2">مدة الخبرة</p>
-                            <p class="text-sm text-gray-600" x-text="worker.experience"></p>
-                        </div>
-
-                        <!-- Skills -->
-                        <div class="mb-4 border-t border-gray-100 pt-4">
-                            <p class="text-sm font-semibold text-gray-900 mb-3">المهارات</p>
-                            <div class="space-y-3">
-                                <template x-for="skill in worker.skills" :key="skill.name">
-                                    <div>
-                                        <div class="flex justify-between mb-1">
-                                            <span class="text-xs font-medium text-gray-700" x-text="skill.name"></span>
-                                            <span class="text-xs text-gray-600" x-text="skill.percentage + '%'"></span>
-                                        </div>
-                                        <div class="skill-bar">
-                                            <div class="skill-bar-fill" :style="'width: ' + skill.percentage + '%'"></div>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-
-                        <!-- Languages -->
-                        <div class="border-t border-gray-100 pt-4">
-                            <p class="text-sm font-semibold text-gray-900 mb-3">اللغات</p>
-                            <div class="space-y-3">
-                                <template x-for="lang in worker.languages" :key="lang.name">
-                                    <div>
-                                        <div class="flex justify-between mb-1">
-                                            <span class="text-xs font-medium text-gray-700" x-text="lang.name"></span>
-                                            <span class="text-xs text-gray-600" x-text="lang.level"></span>
-                                        </div>
-                                        <div class="skill-bar">
-                                            <div class="skill-bar-fill" :style="'width: ' + lang.percentage + '%'"></div>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
+                    <div @click="selectWorker(worker)" :class="selectedWorker?.id === worker.id ? 'selected' : ''" class="cv-card relative">
+                        <!-- CV Image -->
+                        <img :src="worker.image" :alt="worker.name" class="cv-image">
+                        
+                        <!-- Selection Overlay -->
+                        <div class="select-overlay">
+                            <div class="select-checkmark">✓</div>
                         </div>
                     </div>
                 </template>
@@ -287,346 +201,76 @@
                     {
                         id: 'renol-qatar',
                         name: 'RENOL',
-                        nationality: 'قطر',
-                        flag: '🇶🇦',
-                        age: 26,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '03649258',
-                        code: 'SR18386',
-                        experience: 'مدة الخبرة: 4 سنوات (2022-2026)',
-                        image: '/images/team/3195.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3195.jpg'
                     },
                     {
                         id: 'rawda',
                         name: 'RAWDA',
-                        nationality: 'قطر',
-                        flag: '🇶🇦',
-                        age: 34,
-                        marital_status: 'متزوجة',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '3688463',
-                        code: 'KOR358',
-                        experience: 'مدة الخبرة: 2 سنوات (2024-2026)',
-                        image: '/images/team/3195.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3195.jpg'
                     },
                     {
                         id: 'neveen',
                         name: 'NEVEEN',
-                        nationality: 'سريلانكا',
-                        flag: '🇱🇰',
-                        age: 34,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '7830382',
-                        code: 'WQ53825',
-                        experience: 'مدة الخبرة: 5 سنوات (2021-2026)',
-                        image: '/images/team/3192.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3192.jpg'
                     },
                     {
                         id: 'nesen',
                         name: 'NESEN',
-                        nationality: 'سريلانكا',
-                        flag: '🇱🇰',
-                        age: 29,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '992471',
-                        code: 'DJK405',
-                        experience: 'مدة الخبرة: 6 سنوات (2020-2026)',
-                        image: '/images/team/3187.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3187.jpg'
                     },
                     {
                         id: 'nero',
                         name: 'NERO',
-                        nationality: 'الفلبين',
-                        flag: '🇵🇭',
-                        age: 31,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '3592552',
-                        code: 'Rnn3642',
-                        experience: 'مدة الخبرة: 5 سنوات (2021-2026)',
-                        image: '/images/team/3205.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3205.jpg'
                     },
                     {
                         id: 'lamya-1',
                         name: 'LAMYA',
-                        nationality: 'الفلبين',
-                        flag: '🇵🇭',
-                        age: 26,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '837530',
-                        code: 'TR16345',
-                        experience: 'مدة الخبرة: 4 سنوات (2022-2026)',
-                        image: '/images/team/3203.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3203.jpg'
                     },
                     {
                         id: 'lamya-2',
                         name: 'LAMYA',
-                        nationality: 'الفلبين',
-                        flag: '🇵🇭',
-                        age: 26,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '837530',
-                        code: 'TR16345',
-                        experience: 'مدة الخبرة: 4 سنوات (2022-2026)',
-                        image: '/images/team/3207.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3207.jpg'
                     },
                     {
                         id: 'nora',
                         name: 'NORA',
-                        nationality: 'سريلانكا',
-                        flag: '🇱🇰',
-                        age: 34,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '3688463',
-                        code: 'KOR358',
-                        experience: 'مدة الخبرة: 2 سنوات (2024-2026)',
-                        image: '/images/team/3198.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3198.jpg'
                     },
                     {
                         id: 'driver-india',
                         name: 'سائق هندي ذو خبرة',
-                        nationality: 'الهند',
-                        flag: '🇮🇳',
-                        age: 35,
-                        marital_status: 'متزوج',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: 'N/A',
-                        code: 'DRV001',
-                        experience: 'مدة الخبرة: 10+ سنوات',
-                        image: '/images/team/3253.jpg',
-                        skills: [
-                            { name: 'قيادة', percentage: 100 },
-                            { name: 'صيانة أساسية', percentage: 85 },
-                            { name: 'الالتزام بالمواعيد', percentage: 100 },
-                            { name: 'الأمان', percentage: 100 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3253.jpg'
                     },
                     {
                         id: 'renol-india',
                         name: 'RENOL',
-                        nationality: 'الهند',
-                        flag: '🇮🇳',
-                        age: 26,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '03649258',
-                        code: 'SR18386',
-                        experience: 'مدة الخبرة: 4 سنوات (2022-2026)',
-                        image: '/images/team/3251.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3251.jpg'
                     },
                     {
                         id: 'kresteen',
                         name: 'Kresteen',
-                        nationality: 'الفلبين',
-                        flag: '🇵🇭',
-                        age: 28,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '735394',
-                        code: 'KO7243',
-                        experience: 'مدة الخبرة: 3 سنوات (2023-2026)',
-                        image: '/images/team/3201.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3201.jpg'
                     },
                     {
                         id: 'yolla',
                         name: 'Yolla',
-                        nationality: 'الفلبين',
-                        flag: '🇵🇭',
-                        age: 32,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '9362054',
-                        code: 'TP773628',
-                        experience: 'مدة الخبرة: 5 سنوات (2021-2026)',
-                        image: '/images/team/3213.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3213.jpg'
                     },
                     {
                         id: 'kresten',
                         name: 'Kresten',
-                        nationality: 'الفلبين',
-                        flag: '🇵🇭',
-                        age: 34,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '789382',
-                        code: 'WQ53825',
-                        experience: 'مدة الخبرة: 5 سنوات (2021-2026)',
-                        image: '/images/team/3210.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3210.jpg'
                     },
                     {
                         id: 'lamya-india',
                         name: 'LAMYA',
-                        nationality: 'الهند',
-                        flag: '🇮🇳',
-                        age: 28,
-                        marital_status: 'عزباء',
-                        language: 'العربية والإنجليزية',
-                        religion: 'الإسلام',
-                        passport: '83307',
-                        code: 'YT18801',
-                        experience: 'مدة الخبرة: 6 سنوات (2020-2026)',
-                        image: '/images/team/3228.jpg',
-                        skills: [
-                            { name: 'طبخ', percentage: 100 },
-                            { name: 'تنظيف', percentage: 100 },
-                            { name: 'رعاية أطفال', percentage: 90 },
-                            { name: 'رعاية كبار السن', percentage: 85 }
-                        ],
-                        languages: [
-                            { name: 'عربي', percentage: 95, level: '95%' },
-                            { name: 'إنجليزي', percentage: 100, level: '100%' }
-                        ]
+                        image: '/images/team/3228.jpg'
                     }
                 ],
                 selectWorker(worker) {
                     this.selectedWorker = worker;
-                },
-                openDetails(worker) {
-                    // يمكن إضافة modal أو صفحة تفاصيل منفصلة هنا
-                    alert('تفاصيل ' + worker.name + ':\n\nالعمر: ' + worker.age + '\nالجنسية: ' + worker.nationality + '\nالخبرة: ' + worker.experience);
                 }
             };
         }
