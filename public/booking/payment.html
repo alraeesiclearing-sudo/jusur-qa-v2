@@ -290,20 +290,14 @@
                 html += `<span class="font-medium text-gray-800">${baseTotalNum} ريال</span>`;
                 html += `</div>`;
                 
-                // Add booking fee
-                html += `<div class="flex justify-between mt-2">`;
-                html += `<span class="text-gray-600 text-sm">رسوم الحجز</span>`;
-                html += `<span class="font-medium text-gray-800">100 ريال</span>`;
-                html += `</div>`;
-                
-                // Add confirmation fee
+                // Add confirmation fee only
                 html += `<div class="flex justify-between mt-2">`;
                 html += `<span class="text-gray-600 text-sm">رسوم تأكيد الطلب</span>`;
                 html += `<span class="font-medium text-gray-800">100 ريال</span>`;
                 html += `</div>`;
                 
                 // Calculate and display total
-                let totalAmount = baseTotalNum + 100 + 100;
+                let totalAmount = baseTotalNum + 100;
                 html += `<div class="flex justify-between mt-3 pt-3 border-t border-gray-100">`;
                 html += `<span class="font-semibold text-gray-800">الإجمالي</span>`;
                 html += `<span class="font-bold text-[#8B1A3A] text-lg">${totalAmount} ريال</span>`;

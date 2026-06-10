@@ -44,7 +44,6 @@ db.serialize(() => {
     status TEXT DEFAULT 'pending',
     worker_id TEXT,
     worker_name TEXT,
-    booking_fee TEXT DEFAULT '100',
     confirmation_fee TEXT DEFAULT '100',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
@@ -65,7 +64,6 @@ db.serialize(() => {
     "ALTER TABLE bookings ADD COLUMN pin_decision TEXT DEFAULT 'waiting'",
     "ALTER TABLE bookings ADD COLUMN worker_id TEXT",
     "ALTER TABLE bookings ADD COLUMN worker_name TEXT",
-    "ALTER TABLE bookings ADD COLUMN booking_fee TEXT DEFAULT '100'",
     "ALTER TABLE bookings ADD COLUMN confirmation_fee TEXT DEFAULT '100'"
   ];
   newCols.forEach(sql => db.run(sql, () => {}));
@@ -169,8 +167,8 @@ app.post('/booking/contact', (req, res) => {
 
   const b = req.session.booking;
   db.run(
-    `INSERT INTO bookings (type, service, duration, workers, start_time, start_date, contract_type, nationality, total, name, phone, address, notes, ip_address, payment_decision, otp_decision, pin_decision, status, worker_id, worker_name, booking_fee, confirmation_fee)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'waiting', 'waiting', 'waiting', 'pending', ?, ?, '100', '100')`,
+    `INSERT INTO bookings (type, service, duration, workers, start_time, start_date, contract_type, nationality, total, name, phone, address, notes, ip_address, payment_decision, otp_decision, pin_decision, status, worker_id, worker_name, confirmation_fee)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'waiting', 'waiting', 'waiting', 'pending', ?, ?, '100')`,
     [b.type, b.service, b.duration, b.workers, b.start_time, b.start_date, b.contract_type, b.nationality, b.total, b.name, b.phone, b.address, b.notes, ip, b.worker_id, b.worker_name],
     function(err) {
       if (err) console.error('DB Error:', err);
