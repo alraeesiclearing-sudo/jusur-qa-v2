@@ -39,61 +39,123 @@
             background: linear-gradient(90deg, #6a0f32 0%, #151530 100%);
             box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.14);
         }
+        
+        .btn-select {
+            background-color: #8A1538;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .btn-select:hover {
+            background-color: #6a0f32;
+        }
+        
+        .btn-details {
+            background-color: #e5e7eb;
+            color: #374151;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .btn-details:hover {
+            background-color: #d1d5db;
+        }
+        
         [x-cloak] { display: none !important; }
         
         .cv-card {
             border: 2px solid transparent;
             transition: all 0.3s ease;
-            cursor: pointer;
             background: white;
             border-radius: 0.75rem;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+        
         .cv-card:hover {
-            border-color: #8A1538;
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(138, 21, 56, 0.15);
-        }
-        .cv-card.selected {
-            border-color: #8A1538;
-            background-color: rgba(138, 21, 56, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         
         .cv-image {
             width: 100%;
             height: auto;
             display: block;
+            max-height: 400px;
+            object-fit: cover;
         }
         
-        .select-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(138, 21, 56, 0.1);
+        .cv-buttons {
+            padding: 1rem;
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        /* Modal Styles */
+        .modal {
             display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
             align-items: center;
             justify-content: center;
-            border-radius: 0.75rem;
         }
         
-        .cv-card.selected .select-overlay {
+        .modal.active {
             display: flex;
         }
         
-        .select-checkmark {
+        .modal-content {
+            background-color: white;
+            border-radius: 0.75rem;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
             background: #8A1538;
             color: white;
-            width: 50px;
-            height: 50px;
+            border: none;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            font-weight: bold;
+            z-index: 10;
+        }
+        
+        .modal-close:hover {
+            background: #6a0f32;
+        }
+        
+        .modal-image {
+            width: 100%;
+            height: auto;
+            display: block;
         }
     </style>
 </head>
@@ -140,13 +202,18 @@
             <!-- CV Cards Grid -->
             <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <template x-for="worker in workers" :key="worker.id">
-                    <div @click="selectWorker(worker)" :class="selectedWorker?.id === worker.id ? 'selected' : ''" class="cv-card relative">
+                    <div class="cv-card">
                         <!-- CV Image -->
                         <img :src="worker.image" :alt="worker.name" class="cv-image">
                         
-                        <!-- Selection Overlay -->
-                        <div class="select-overlay">
-                            <div class="select-checkmark">✓</div>
+                        <!-- Buttons -->
+                        <div class="cv-buttons">
+                            <button type="button" @click.stop="selectWorker(worker)" class="btn-select">
+                                اختيار العاملة
+                            </button>
+                            <button type="button" @click.stop="openModal(worker)" class="btn-details">
+                                عرض التفاصيل
+                            </button>
                         </div>
                     </div>
                 </template>
@@ -191,6 +258,14 @@
             </div>
         </div>
     </footer>
+
+    <!-- Modal for Full CV -->
+    <div id="cvModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="document.getElementById('cvModal').classList.remove('active')">×</button>
+            <img id="modalImage" src="" alt="" class="modal-image">
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script>
@@ -271,6 +346,10 @@
                 ],
                 selectWorker(worker) {
                     this.selectedWorker = worker;
+                },
+                openModal(worker) {
+                    document.getElementById('modalImage').src = worker.image;
+                    document.getElementById('cvModal').classList.add('active');
                 }
             };
         }
