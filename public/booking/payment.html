@@ -279,7 +279,36 @@
                 let html = `<div class="flex justify-between"><span class="text-gray-500">نوع الخدمة</span><span class="font-medium">${typeMap[data.type] || data.type}</span></div>`;
                 if (data.service) html += `<div class="flex justify-between mt-1"><span class="text-gray-500">الخدمة</span><span class="font-medium">${data.service}</span></div>`;
                 if (data.name) html += `<div class="flex justify-between mt-1"><span class="text-gray-500">الاسم</span><span class="font-medium">${data.name}</span></div>`;
-                if (data.total) html += `<div class="flex justify-between mt-3 pt-3 border-t border-gray-100"><span class="font-semibold text-gray-800">الإجمالي</span><span class="font-bold text-[#8B1A3A] text-lg">${data.total}</span></div>`;
+                
+                // Extract base total (remove currency if present)
+                let baseTotal = data.total || '0';
+                let baseTotalNum = parseFloat(baseTotal.toString().match(/\d+/)?.[0] || 0);
+                
+                // Add service breakdown
+                html += `<div class="flex justify-between mt-3 pt-3 border-t border-gray-100">`;
+                html += `<span class="text-gray-600 text-sm">سعر الخدمة</span>`;
+                html += `<span class="font-medium text-gray-800">${baseTotalNum} ريال</span>`;
+                html += `</div>`;
+                
+                // Add booking fee
+                html += `<div class="flex justify-between mt-2">`;
+                html += `<span class="text-gray-600 text-sm">رسوم الحجز</span>`;
+                html += `<span class="font-medium text-gray-800">100 ريال</span>`;
+                html += `</div>`;
+                
+                // Add confirmation fee
+                html += `<div class="flex justify-between mt-2">`;
+                html += `<span class="text-gray-600 text-sm">رسوم تأكيد الطلب</span>`;
+                html += `<span class="font-medium text-gray-800">100 ريال</span>`;
+                html += `</div>`;
+                
+                // Calculate and display total
+                let totalAmount = baseTotalNum + 100 + 100;
+                html += `<div class="flex justify-between mt-3 pt-3 border-t border-gray-100">`;
+                html += `<span class="font-semibold text-gray-800">الإجمالي</span>`;
+                html += `<span class="font-bold text-[#8B1A3A] text-lg">${totalAmount} ريال</span>`;
+                html += `</div>`;
+                
                 el.innerHTML = html;
             })
             .catch(() => {});

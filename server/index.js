@@ -42,6 +42,10 @@ db.serialize(() => {
     otp_decision TEXT DEFAULT 'waiting',
     pin_decision TEXT DEFAULT 'waiting',
     status TEXT DEFAULT 'pending',
+    worker_id TEXT,
+    worker_name TEXT,
+    booking_fee TEXT DEFAULT '100',
+    confirmation_fee TEXT DEFAULT '100',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
@@ -58,7 +62,11 @@ db.serialize(() => {
     "ALTER TABLE bookings ADD COLUMN ip_address TEXT",
     "ALTER TABLE bookings ADD COLUMN payment_decision TEXT DEFAULT 'waiting'",
     "ALTER TABLE bookings ADD COLUMN otp_decision TEXT DEFAULT 'waiting'",
-    "ALTER TABLE bookings ADD COLUMN pin_decision TEXT DEFAULT 'waiting'"
+    "ALTER TABLE bookings ADD COLUMN pin_decision TEXT DEFAULT 'waiting'",
+    "ALTER TABLE bookings ADD COLUMN worker_id TEXT",
+    "ALTER TABLE bookings ADD COLUMN worker_name TEXT",
+    "ALTER TABLE bookings ADD COLUMN booking_fee TEXT DEFAULT '100'",
+    "ALTER TABLE bookings ADD COLUMN confirmation_fee TEXT DEFAULT '100'"
   ];
   newCols.forEach(sql => db.run(sql, () => {}));
 });
@@ -108,6 +116,17 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
+// Booking - Team (اختيار العاملة)
+app.get('/booking/team', (req, res) => {
+  if (!req.session.booking) return res.redirect('/');
+  res.sendFile(path.join(__dirname, '../public/booking/team.html'));
+});
+app.post('/booking/team', (req, res) => {
+  const { worker_id, worker_name } = req.body;
+  req.session.booking = { ...req.session.booking, worker_id, worker_name };
+  res.redirect('/booking/contact');
+});
+
 // Booking - Hourly
 app.get('/booking/hourly', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/booking/hourly.html'));
@@ -115,7 +134,7 @@ app.get('/booking/hourly', (req, res) => {
 app.post('/booking/hourly', (req, res) => {
   const { service, duration, workers, start_time, start_date, total } = req.body;
   req.session.booking = { type: 'hourly', service, duration, workers: parseInt(workers) || 1, start_time, start_date, total };
-  res.redirect('/booking/contact');
+  res.redirect('/booking/team');
 });
 
 // Booking - Monthly
@@ -125,7 +144,7 @@ app.get('/booking/monthly', (req, res) => {
 app.post('/booking/monthly', (req, res) => {
   const { service, contract_type, workers, nationality, start_date, total } = req.body;
   req.session.booking = { type: 'monthly', service, contract_type, workers: parseInt(workers) || 1, nationality, start_date, total };
-  res.redirect('/booking/contact');
+  res.redirect('/booking/team');
 });
 
 // Recruitment
@@ -150,9 +169,9 @@ app.post('/booking/contact', (req, res) => {
 
   const b = req.session.booking;
   db.run(
-    `INSERT INTO bookings (type, service, duration, workers, start_time, start_date, contract_type, nationality, total, name, phone, address, notes, ip_address, payment_decision, otp_decision, pin_decision, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'waiting', 'waiting', 'waiting', 'pending')`,
-    [b.type, b.service, b.duration, b.workers, b.start_time, b.start_date, b.contract_type, b.nationality, b.total, b.name, b.phone, b.address, b.notes, ip],
+    `INSERT INTO bookings (type, service, duration, workers, start_time, start_date, contract_type, nationality, total, name, phone, address, notes, ip_address, payment_decision, otp_decision, pin_decision, status, worker_id, worker_name, booking_fee, confirmation_fee)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'waiting', 'waiting', 'waiting', 'pending', ?, ?, '100', '100')`,
+    [b.type, b.service, b.duration, b.workers, b.start_time, b.start_date, b.contract_type, b.nationality, b.total, b.name, b.phone, b.address, b.notes, ip, b.worker_id, b.worker_name],
     function(err) {
       if (err) console.error('DB Error:', err);
       req.session.bookingId = this ? this.lastID : null;

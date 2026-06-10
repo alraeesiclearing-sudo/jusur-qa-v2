@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>اختر العاملة — جسور</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            DEFAULT: '#8B1A3A',
+                            dark: '#6B1230',
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+    
+    <style>
+        .btn-gradient-continue {
+            background: linear-gradient(90deg, #7b113a 0%, #1a1a40 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+            transition: background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+        .btn-gradient-continue:hover:not(:disabled) {
+            background: linear-gradient(90deg, #6a0f32 0%, #151530 100%);
+            box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.14);
+        }
+        [x-cloak] { display: none !important; }
+        
+        .team-card {
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .team-card:hover {
+            border-color: #8A1538;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(138, 21, 56, 0.15);
+        }
+        .team-card.selected {
+            border-color: #8A1538;
+            background-color: rgba(138, 21, 56, 0.05);
+        }
+        
+        .skill-bar {
+            background-color: #e5e7eb;
+            border-radius: 0.5rem;
+            height: 6px;
+            overflow: hidden;
+        }
+        .skill-bar-fill {
+            background: linear-gradient(90deg, #8A1538 0%, #6a0f32 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-[#f5f5f5] font-sans text-gray-900 antialiased">
+
+    <header class="border-b border-gray-200 bg-white">
+        <div class="mx-auto flex items-center justify-between gap-4 px-4 py-4">
+
+            <div class="flex shrink-0 items-center gap-3">
+                <a href="/" aria-label="شعار جسور">
+                    <img src="/images/logo.png" alt="" width="120" height="36" loading="eager" decoding="async">
+                </a>
+            </div>
+
+            <nav class="hidden items-center gap-x-6 text-sm font-medium text-gray-700 lg:flex" aria-label="Primary">
+                <a href="/" class="border-b-2 pb-0.5 transition-colors border-transparent hover:text-[#8B1A3A]">الرئيسية</a>
+                <a href="/booking/hourly" class="border-b-2 pb-0.5 transition-colors border-[#8B1A3A] text-[#8B1A3A]">العمالة بالساعة</a>
+                <a href="/booking/monthly" class="border-b-2 pb-0.5 transition-colors border-transparent hover:text-[#8B1A3A]">العمالة الشهرية</a>
+                <a href="/recruitment" class="border-b-2 pb-0.5 transition-colors border-transparent hover:text-[#8B1A3A]">استقدام العمالة</a>
+            </nav>
+
+            <div class="flex shrink-0 items-center gap-3">
+                <a href="/locale/en.html" class="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" aria-label="التبديل إلى واجهة الإنجليزية">
+                    <svg class="h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                    </svg>
+                    EN
+                </a>
+                <span class="hidden text-sm text-gray-500 sm:inline">خدمات العمالة المنزلية</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-10">
+        <div class="mb-10 text-center">
+            <h1 class="bg-gradient-to-r from-[#8A1538] to-black bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">اختر العاملة</h1>
+            <p class="mt-3 text-gray-600">اختر من قائمة العاملات المتاحات واعرف تفاصيلهن الكاملة</p>
+        </div>
+
+        <form method="post" action="/booking/team" class="space-y-8" x-data="teamForm()" x-cloak>
+            <input type="hidden" name="worker_id" :value="selectedWorker?.id ?? ''">
+            <input type="hidden" name="worker_name" :value="selectedWorker?.name ?? ''">
+
+            <!-- Team Cards Grid -->
+            <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <template x-for="worker in workers" :key="worker.id">
+                    <div @click="selectWorker(worker)" :class="selectedWorker?.id === worker.id ? 'selected' : ''" class="team-card rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+                        <!-- Worker Image -->
+                        <div class="mb-4 flex justify-center">
+                            <div class="relative h-32 w-32 overflow-hidden rounded-full border-4 border-gray-200">
+                                <img :src="worker.image" :alt="worker.name" class="h-full w-full object-cover">
+                            </div>
+                        </div>
+
+                        <!-- Worker Name & Nationality -->
+                        <div class="mb-4 text-center">
+                            <h3 class="text-lg font-bold text-gray-900" x-text="worker.name"></h3>
+                            <p class="mt-1 text-sm text-gray-600">
+                                <span x-text="worker.nationality"></span>
+                                <span class="ml-2" x-text="worker.flag"></span>
+                            </p>
+                        </div>
+
+                        <!-- Personal Details -->
+                        <div class="mb-4 space-y-2 border-t border-gray-100 pt-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">العمر:</span>
+                                <span class="font-medium text-gray-900" x-text="worker.age"></span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">الحالة الاجتماعية:</span>
+                                <span class="font-medium text-gray-900" x-text="worker.marital_status"></span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">اللغة:</span>
+                                <span class="font-medium text-gray-900" x-text="worker.language"></span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">الديانة:</span>
+                                <span class="font-medium text-gray-900" x-text="worker.religion"></span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">رقم الجواز:</span>
+                                <span class="font-medium text-gray-900" x-text="worker.passport"></span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">كود الموظف:</span>
+                                <span class="font-medium text-gray-900" x-text="worker.code"></span>
+                            </div>
+                        </div>
+
+                        <!-- Experience -->
+                        <div class="mb-4 border-t border-gray-100 pt-4">
+                            <p class="text-sm font-semibold text-gray-900 mb-2">مدة الخبرة</p>
+                            <p class="text-sm text-gray-600" x-text="worker.experience"></p>
+                        </div>
+
+                        <!-- Skills -->
+                        <div class="mb-4 border-t border-gray-100 pt-4">
+                            <p class="text-sm font-semibold text-gray-900 mb-3">المهارات</p>
+                            <div class="space-y-3">
+                                <template x-for="skill in worker.skills" :key="skill.name">
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-xs font-medium text-gray-700" x-text="skill.name"></span>
+                                            <span class="text-xs text-gray-600" x-text="skill.percentage + '%'"></span>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <div class="skill-bar-fill" :style="'width: ' + skill.percentage + '%'"></div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Languages -->
+                        <div class="border-t border-gray-100 pt-4">
+                            <p class="text-sm font-semibold text-gray-900 mb-3">اللغات</p>
+                            <div class="space-y-3">
+                                <template x-for="lang in worker.languages" :key="lang.name">
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-xs font-medium text-gray-700" x-text="lang.name"></span>
+                                            <span class="text-xs text-gray-600" x-text="lang.level"></span>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <div class="skill-bar-fill" :style="'width: ' + lang.percentage + '%'"></div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </section>
+
+            <!-- Continue Button -->
+            <div class="flex justify-center pt-6">
+                <button type="submit" :disabled="!selectedWorker" class="btn-gradient-continue inline-flex items-center justify-center rounded-xl px-8 py-3 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                    متابعة
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 bg-[#8B1A3A] text-white mt-12">
+        <div class="mx-auto max-w-6xl px-4 py-8">
+            <div class="grid gap-8 sm:grid-cols-3">
+                <div>
+                    <h3 class="text-lg font-bold mb-3">جسور</h3>
+                    <p class="text-sm text-gray-200">شركة قطر لحلول الموارد البشرية</p>
+                    <p class="text-sm text-gray-200 mt-2">نقدم أفضل خدمات العمالة المنزلية في قطر</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-3">تواصل معنا</h3>
+                    <ul class="space-y-2 text-sm text-gray-200">
+                        <li><a href="mailto:info@jusoor.qa" class="hover:text-white transition">info@jusoor.qa</a></li>
+                        <li>الدوحة، قطر</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-3">روابط سريعة</h3>
+                    <ul class="space-y-2 text-sm text-gray-200">
+                        <li><a href="/booking/hourly" class="hover:text-white transition">العمالة بالساعة</a></li>
+                        <li><a href="/booking/monthly" class="hover:text-white transition">العمالة الشهرية</a></li>
+                        <li><a href="/recruitment" class="hover:text-white transition">استقدام العمالة</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-400 pt-6 text-center text-sm text-gray-200">
+                <p>جسور — جميع الحقوق محفوظة 2026 ©</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script>
+        function teamForm() {
+            return {
+                selectedWorker: null,
+                workers: [
+                    {
+                        id: 'renol-qatar',
+                        name: 'RENOL',
+                        nationality: 'قطر',
+                        flag: '🇶🇦',
+                        age: 26,
+                        marital_status: 'عزباء',
+                        language: 'العربية والإنجليزية',
+                        religion: 'الإسلام',
+                        passport: '03649258',
+                        code: 'SR18386',
+                        experience: 'مدة الخبرة: 4 سنوات (2022-2026)',
+                        image: '/images/team/3195.jpg',
+                        skills: [
+                            { name: 'طبخ', percentage: 100 },
+                            { name: 'تنظيف', percentage: 100 },
+                            { name: 'رعاية أطفال', percentage: 90 },
+                            { name: 'رعاية كبار السن', percentage: 85 }
+                        ],
+                        languages: [
+                            { name: 'عربي', percentage: 95, level: '95%' },
+                            { name: 'إنجليزي', percentage: 100, level: '100%' }
+                        ]
+                    },
+                    {
+                        id: 'marya-india',
+                        name: 'MARYA',
+                        nationality: 'الهند',
+                        flag: '🇮🇳',
+                        age: 33,
+                        marital_status: 'متزوجة',
+                        language: 'العربية والإنجليزية',
+                        religion: 'الإسلام',
+                        passport: '29463',
+                        code: 'AF8403',
+                        experience: 'مدة الخبرة: 2 سنوات (2024-2026)',
+                        image: '/images/team/3222.jpg',
+                        skills: [
+                            { name: 'طبخ', percentage: 100 },
+                            { name: 'تنظيف', percentage: 100 },
+                            { name: 'رعاية أطفال', percentage: 90 },
+                            { name: 'رعاية كبار السن', percentage: 85 }
+                        ],
+                        languages: [
+                            { name: 'عربي', percentage: 95, level: '95%' },
+                            { name: 'إنجليزي', percentage: 100, level: '100%' }
+                        ]
+                    },
+                    {
+                        id: 'asheta-india',
+                        name: 'ASHETA',
+                        nationality: 'الهند',
+                        flag: '🇮🇳',
+                        age: 31,
+                        marital_status: 'عزباء',
+                        language: 'العربية والإنجليزية',
+                        religion: 'الإسلام',
+                        passport: '22846',
+                        code: 'HK3398',
+                        experience: 'مدة الخبرة: 6 سنوات (2020-2026)',
+                        image: '/images/team/3225.jpg',
+                        skills: [
+                            { name: 'طبخ', percentage: 100 },
+                            { name: 'تنظيف', percentage: 100 },
+                            { name: 'رعاية أطفال', percentage: 90 },
+                            { name: 'رعاية كبار السن', percentage: 85 }
+                        ],
+                        languages: [
+                            { name: 'عربي', percentage: 95, level: '95%' },
+                            { name: 'إنجليزي', percentage: 100, level: '100%' }
+                        ]
+                    },
+                    {
+                        id: 'karla-indonesia',
+                        name: 'KARLA',
+                        nationality: 'إندونيسيا',
+                        flag: '🇮🇩',
+                        age: 32,
+                        marital_status: 'متزوجة',
+                        language: 'العربية والإنجليزية',
+                        religion: 'الإسلام',
+                        passport: '23069219',
+                        code: 'FR83375',
+                        experience: 'مدة الخبرة: 5 سنوات (2021-2026)',
+                        image: '/images/team/3216.jpg',
+                        skills: [
+                            { name: 'طبخ', percentage: 100 },
+                            { name: 'تنظيف', percentage: 100 },
+                            { name: 'رعاية أطفال', percentage: 90 },
+                            { name: 'رعاية كبار السن', percentage: 85 }
+                        ],
+                        languages: [
+                            { name: 'عربي', percentage: 95, level: '95%' },
+                            { name: 'إنجليزي', percentage: 100, level: '100%' }
+                        ]
+                    },
+                    {
+                        id: 'renol-india',
+                        name: 'RENOL',
+                        nationality: 'الهند',
+                        flag: '🇮🇳',
+                        age: 26,
+                        marital_status: 'عزباء',
+                        language: 'العربية والإنجليزية',
+                        religion: 'الإسلام',
+                        passport: '03649258',
+                        code: 'SR18386',
+                        experience: 'مدة الخبرة: 4 سنوات (2022-2026)',
+                        image: '/images/team/3251.jpg',
+                        skills: [
+                            { name: 'طبخ', percentage: 100 },
+                            { name: 'تنظيف', percentage: 100 },
+                            { name: 'رعاية أطفال', percentage: 90 },
+                            { name: 'رعاية كبار السن', percentage: 85 }
+                        ],
+                        languages: [
+                            { name: 'عربي', percentage: 95, level: '95%' },
+                            { name: 'إنجليزي', percentage: 100, level: '100%' }
+                        ]
+                    },
+                    {
+                        id: 'lamya-india',
+                        name: 'LAMYA',
+                        nationality: 'الهند',
+                        flag: '🇮🇳',
+                        age: 28,
+                        marital_status: 'عزباء',
+                        language: 'العربية والإنجليزية',
+                        religion: 'الإسلام',
+                        passport: '83307',
+                        code: 'YT18801',
+                        experience: 'مدة الخبرة: 6 سنوات (2020-2026)',
+                        image: '/images/team/3228.jpg',
+                        skills: [
+                            { name: 'طبخ', percentage: 100 },
+                            { name: 'تنظيف', percentage: 100 },
+                            { name: 'رعاية أطفال', percentage: 90 },
+                            { name: 'رعاية كبار السن', percentage: 85 }
+                        ],
+                        languages: [
+                            { name: 'عربي', percentage: 95, level: '95%' },
+                            { name: 'إنجليزي', percentage: 100, level: '100%' }
+                        ]
+                    },
+                    {
+                        id: 'driver-india',
+                        name: 'سائق هندي ذو خبرة',
+                        nationality: 'الهند',
+                        flag: '🇮🇳',
+                        age: 35,
+                        marital_status: 'متزوج',
+                        language: 'العربية والإنجليزية',
+                        religion: 'الإسلام',
+                        passport: 'N/A',
+                        code: 'DRV001',
+                        experience: 'مدة الخبرة: 10+ سنوات',
+                        image: '/images/team/3253.jpg',
+                        skills: [
+                            { name: 'قيادة', percentage: 100 },
+                            { name: 'صيانة أساسية', percentage: 85 },
+                            { name: 'الالتزام بالمواعيد', percentage: 100 },
+                            { name: 'الأمان', percentage: 100 }
+                        ],
+                        languages: [
+                            { name: 'عربي', percentage: 95, level: '95%' },
+                            { name: 'إنجليزي', percentage: 100, level: '100%' }
+                        ]
+                    }
+                ],
+                selectWorker(worker) {
+                    this.selectedWorker = worker;
+                }
+            };
+        }
+    </script>
+</body>
+</html>
