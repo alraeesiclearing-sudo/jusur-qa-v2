@@ -77,16 +77,46 @@
         [x-cloak] { display: none !important; }
         
         .cv-card {
-            border: 2px solid transparent;
+            border: 3px solid transparent;
             transition: all 0.3s ease;
             background: white;
             border-radius: 0.75rem;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         
         .cv-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .cv-card.selected {
+            border-color: #8A1538;
+            box-shadow: 0 0 0 3px rgba(138, 21, 56, 0.2), 0 4px 12px rgba(138, 21, 56, 0.25);
+        }
+        
+        .cv-checkmark {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #8A1538;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(138, 21, 56, 0.3);
+        }
+        
+        .cv-card.selected .cv-checkmark {
+            opacity: 1;
         }
         
         .cv-image {
@@ -196,13 +226,16 @@
         </div>
 
         <form method="post" action="/booking/team" class="space-y-8" x-data="teamForm()" x-cloak>
-            <input type="hidden" name="worker_id" :value="selectedWorker?.id ?? ''">
-            <input type="hidden" name="worker_name" :value="selectedWorker?.name ?? ''">
+            <input type="hidden" name="worker_id" value="">
+            <input type="hidden" name="worker_name" value="">
 
             <!-- CV Cards Grid -->
             <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <template x-for="worker in workers" :key="worker.id">
-                    <div class="cv-card">
+                    <div :class="['cv-card', selectedWorker?.id === worker.id ? 'selected' : '']">
+                        <!-- Checkmark -->
+                        <div class="cv-checkmark">✓</div>
+                        
                         <!-- CV Image -->
                         <img :src="worker.image" :alt="worker.name" class="cv-image">
                         
@@ -346,6 +379,9 @@
                 ],
                 selectWorker(worker) {
                     this.selectedWorker = worker;
+                    // Update form inputs
+                    document.querySelector('input[name="worker_id"]').value = worker.id;
+                    document.querySelector('input[name="worker_name"]').value = worker.name;
                 },
                 openModal(worker) {
                     document.getElementById('modalImage').src = worker.image;
